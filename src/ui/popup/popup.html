@@ -31,6 +31,9 @@
     </div>
   </header>
 
+
+
+
   <!-- Main Content -->
   <main class="main">
     
@@ -67,7 +70,7 @@
         <select id="model-select" class="form-select">
           <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite (Fast)</option>
           <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash Experimental</option>
-          <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</option>
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro (Advanced)</option>
         </select>
       </div>
       
@@ -79,6 +82,59 @@
         <span>API key required. <a href="#" id="add-api-key-link">Add in settings</a></span>
       </div>
     </section>
+
+
+
+
+    <!-- 🔥 NEW: Scroll Cache Section (Gemini Cloud ONLY) -->
+    <section id="cache-section" class="section cache-section hidden">
+      <div class="section-header">
+        <h2 class="section-title">Scroll Cache</h2>
+        <span id="cache-info-icon" class="cache-info-icon" title="Why cache restrictions?">ℹ️</span>
+      </div>
+      
+      <div class="cache-stats">
+        <div class="cache-stat-item">
+          <span id="cache-size-display" class="cache-size">0 KB</span>
+          <span class="cache-separator">/</span>
+          <span id="cache-limit-display" class="cache-limit">25600 KB</span>
+        </div>
+        <span id="cache-item-count" class="cache-item-count">(0 items)</span>
+      </div>
+      
+      <div class="cache-progress-container">
+        <div id="cache-fill" class="cache-fill cache-fill-normal" style="width: 0%"></div>
+      </div>
+      
+      <!-- Warning Banner (shows at 90%+) -->
+      <div id="cache-warning-banner" class="cache-warning-banner hidden">
+        <svg class="warning-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 9v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span id="cache-warning-text">Cache at 90%+. Wait 1 minute before next extraction.</span>
+      </div>
+      
+      <!-- Extraction Preview Card -->
+      <div id="extraction-preview" class="extraction-preview-card hidden">
+        <svg class="preview-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m14-7l-5-5-5 5m5-5v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="extraction-preview-text">Ready to extract</span>
+      </div>
+      
+      <!-- Info Tooltip (hidden by default, shown on hover) -->
+      <div id="cache-info-tooltip" class="cache-info-tooltip hidden">
+        <strong>Why Cache Restrictions?</strong><br>
+        Gemini Cloud API has TPM (Tokens Per Minute) limits:<br>
+        • Lite (1M TPM): Send all cache<br>
+        • Exp (250K TPM): Send newest 90% only<br>
+        • Pro (125K TPM): Send newest 90% only<br><br>
+        This prevents TPM errors and ensures smooth extraction.
+      </div>
+    </section>
+
+
+
 
     <!-- Extraction Mode -->
     <section class="section extraction-section">
@@ -107,6 +163,9 @@
       </div>
     </section>
 
+
+
+
     <!-- Content Type -->
     <section class="section content-section">
       <div class="section-header">
@@ -123,6 +182,9 @@
       </select>
     </section>
 
+
+
+
     <!-- Extract Button -->
     <section class="section action-section">
       <button id="extract-btn" class="btn btn-primary btn-large">
@@ -132,6 +194,10 @@
         Extract Data
       </button>
     </section>
+
+
+
+
     <!-- Rate Limit Display -->
     <section id="rate-limit-section" class="section rate-limit-section hidden">
       <div class="section-header">
@@ -166,6 +232,9 @@
       </div>
     </section>
 
+
+
+
     <!-- Extraction Progress -->
     <section id="progress-section" class="section progress-section hidden">
       <div class="progress-container">
@@ -173,6 +242,9 @@
         <p id="progress-text" class="progress-text">Extracting data...</p>
       </div>
     </section>
+
+
+
 
     <!-- Results Display -->
     <section id="results-section" class="section results-section hidden">
@@ -234,22 +306,30 @@
       </div>
     </section>
 
+
+
+
   </main>
+
+
+
 
   <!-- Notifications Container -->
   <div id="notifications-container" class="notifications-container"></div>
 
+
+
+
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-links">
-      <a href="#" id="history-link" class="footer-link">History</a>
-      <span class="footer-separator">•</span>
-      <a href="#" id="help-link" class="footer-link">Help</a>
-      <span class="footer-separator">•</span>
-      <a href="#" id="feedback-link" class="footer-link">Feedback</a>
+      <a href="https://github.com/Nesar21" target="_blank" id="github-link" class="footer-link">GitHub</a>
     </div>
-    <div class="footer-version">v1.0.0</div>
+    <div class="footer-version">v1.1.0</div>
   </footer>
+
+
+
 
   <!-- Scripts -->
   <script src="popup.js" type="module"></script>

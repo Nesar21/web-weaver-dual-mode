@@ -1,4 +1,4 @@
-// VERSION: v1.0.0 | LAST UPDATED: 2025-10-26 | FEATURE: Popup UI Logic
+// VERSION: v1.1.0 | LAST UPDATED: 2025-10-29 | FEATURE: Popup UI Logic + Scroll Cache + History
 
 /**
  * Popup UI Controller
@@ -16,6 +16,13 @@ const state = {
   rateLimits: {
     rpm: { current: 0, limit: 0 },
     rpd: { current: 0, limit: 0 }
+  },
+  // 🔥 NEW: Cache state
+  cache: {
+    currentKB: 0,
+    limitKB: 3600,
+    itemCount: 0,
+    percentage: 0
   }
 };
 
@@ -29,6 +36,19 @@ const elements = {
   modelSelect: null,
   apiKeyWarning: null,
   addApiKeyLink: null,
+  
+  // 🔥 NEW: Cache elements
+  cacheSection: null,
+  cacheSizeDisplay: null,
+  cacheLimitDisplay: null,
+  cacheItemCount: null,
+  cacheFill: null,
+  cacheWarningBanner: null,
+  cacheWarningText: null,
+  extractionPreview: null,
+  extractionPreviewText: null,
+  cacheInfoIcon: null,
+  cacheInfoTooltip: null,
   
   // Extraction
   modeExtractAll: null,
@@ -94,6 +114,11 @@ async function initialize() {
   // Update UI
   updateUI();
   
+  // 🔥 NEW: Initialize cache UI if Gemini Cloud
+  if (state.currentProvider === 'gemini_cloud') {
+    await initializeCacheUI();
+  }
+  
   console.log('[Popup] Initialized');
 }
 
@@ -109,6 +134,19 @@ function cacheElements() {
   elements.modelSelect = document.getElementById('model-select');
   elements.apiKeyWarning = document.getElementById('api-key-warning');
   elements.addApiKeyLink = document.getElementById('add-api-key-link');
+  
+  // 🔥 NEW: Cache elements
+  elements.cacheSection = document.getElementById('cache-section');
+  elements.cacheSizeDisplay = document.getElementById('cache-size-display');
+  elements.cacheLimitDisplay = document.getElementById('cache-limit-display');
+  elements.cacheItemCount = document.getElementById('cache-item-count');
+  elements.cacheFill = document.getElementById('cache-fill');
+  elements.cacheWarningBanner = document.getElementById('cache-warning-banner');
+  elements.cacheWarningText = document.getElementById('cache-warning-text');
+  elements.extractionPreview = document.getElementById('extraction-preview');
+  elements.extractionPreviewText = document.getElementById('extraction-preview-text');
+  elements.cacheInfoIcon = document.getElementById('cache-info-icon');
+  elements.cacheInfoTooltip = document.getElementById('cache-info-tooltip');
   
   // Extraction
   elements.modeExtractAll = document.getElementById('mode-extract-all');
@@ -151,6 +189,108 @@ function cacheElements() {
   elements.historyLink = document.getElementById('history-link');
   elements.helpLink = document.getElementById('help-link');
   elements.feedbackLink = document.getElementById('feedback-link');
+}
+
+// 🔥 NEW: Initialize cache UI
+async function initializeCacheUI() {
+  try {
+    // Get current cache status from content script
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    const response = await chrome.tabs.sendMessage(tab.id, {
+      type: 'GET_SCROLL_CACHE'
+    });
+    
+    if (response && response.success) {
+      updateCacheDisplay(response.cacheSize);
+    }
+    
+    // Show cache section
+    elements.cacheSection.classList.remove('hidden');
+    
+  } catch (error) {
+    console.error('[Popup] Cache UI init failed', error);
+  }
+}
+
+// 🔥 NEW: Update cache display
+function updateCacheDisplay(cacheSize) {
+  if (!cacheSize) return;
+  
+  state.cache = {
+    currentKB: cacheSize.kb || 0,
+    limitKB: cacheSize.maxKB || 3600,
+    itemCount: cacheSize.itemCount || 0,
+    percentage: cacheSize.percentage || 0
+  };
+  
+  // Update size displays
+  elements.cacheSizeDisplay.textContent = `${state.cache.currentKB} KB`;
+  elements.cacheLimitDisplay.textContent = `${state.cache.limitKB} KB`;
+  elements.cacheItemCount.textContent = `(${state.cache.itemCount} items)`;
+  
+  // Update progress bar
+  elements.cacheFill.style.width = `${state.cache.percentage}%`;
+  
+  // Update color based on percentage
+  elements.cacheFill.className = 'cache-fill';
+  if (state.cache.percentage < 60) {
+    elements.cacheFill.classList.add('cache-fill-normal');
+  } else if (state.cache.percentage < 75) {
+    elements.cacheFill.classList.add('cache-fill-caution');
+  } else if (state.cache.percentage < 90) {
+    elements.cacheFill.classList.add('cache-fill-warning');
+  } else {
+    elements.cacheFill.classList.add('cache-fill-critical');
+  }
+  
+  // Show warning at 90%+
+  if (state.cache.percentage >= 90) {
+    const waitTime = getWaitTimeForCache(state.cache.percentage);
+    elements.cacheWarningText.textContent = 
+      `Cache at ${Math.round(state.cache.percentage)}%. Wait ${waitTime}s before next extraction.`;
+    elements.cacheWarningBanner.classList.remove('hidden');
+    
+    // Disable extract button temporarily
+    elements.extractBtn.disabled = true;
+    setTimeout(() => {
+      elements.extractBtn.disabled = false;
+      elements.cacheWarningBanner.classList.add('hidden');
+    }, waitTime * 1000);
+  } else {
+    elements.cacheWarningBanner.classList.add('hidden');
+  }
+  
+  // Update extraction preview
+  if (state.cache.itemCount > 0) {
+    const previewKB = Math.min(state.cache.currentKB, getMaxSendableKB(state.currentModel));
+    elements.extractionPreviewText.textContent = 
+      `Will send ${previewKB} KB (${Math.round(state.cache.itemCount * 0.9)} items) to ${state.currentModel}`;
+    elements.extractionPreview.classList.remove('hidden');
+  } else {
+    elements.extractionPreview.classList.add('hidden');
+  }
+}
+
+// 🔥 NEW: Get wait time based on cache percentage
+function getWaitTimeForCache(percentage) {
+  if (percentage >= 95) return 60; // 1 min
+  if (percentage >= 90) return 30; // 30s
+  return 0;
+}
+
+// 🔥 NEW: Get max sendable KB based on model TPM
+function getMaxSendableKB(modelId) {
+  const tpmLimits = {
+    'gemini-2.0-flash-lite': 1000000, // 1M TPM
+    'gemini-2.0-flash-exp': 250000,   // 250K TPM
+    'gemini-2.5-pro': 125000          // 125K TPM
+  };
+  
+  const tpm = tpmLimits[modelId] || 250000;
+  // Assume 1 token ≈ 4 chars, 1 KB ≈ 1024 chars
+  // TPM / 60 = tokens per second, * 4 = chars, / 1024 = KB
+  return Math.floor((tpm / 60) * 4 / 1024);
 }
 
 /**
@@ -293,6 +433,7 @@ function sendMessage(message) {
     });
   });
 }
+
 /**
  * Setup event listeners
  */
@@ -332,23 +473,51 @@ function setupEventListeners() {
     openSettings();
   });
   
-  // Footer links
-  elements.historyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    openHistory();
-  });
+  // 🔥 NEW: Cache info icon tooltip
+  if (elements.cacheInfoIcon) {
+    elements.cacheInfoIcon.addEventListener('mouseenter', showCacheTooltip);
+    elements.cacheInfoIcon.addEventListener('mouseleave', hideCacheTooltip);
+  }
   
-  elements.helpLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    openHelp();
-  });
+  // 🔥 NEW: History button - opens history page
+  if (elements.historyLink) {
+    elements.historyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      openHistory();
+    });
+  }
   
-  elements.feedbackLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    openFeedback();
-  });
+  // Help link
+  if (elements.helpLink) {
+    elements.helpLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      openHelp();
+    });
+  }
+  
+  // Feedback link
+  if (elements.feedbackLink) {
+    elements.feedbackLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      openFeedback();
+    });
+  }
   
   console.log('[Popup] Event listeners attached');
+}
+
+// 🔥 NEW: Show cache tooltip
+function showCacheTooltip() {
+  if (elements.cacheInfoTooltip) {
+    elements.cacheInfoTooltip.classList.remove('hidden');
+  }
+}
+
+// 🔥 NEW: Hide cache tooltip
+function hideCacheTooltip() {
+  if (elements.cacheInfoTooltip) {
+    elements.cacheInfoTooltip.classList.add('hidden');
+  }
 }
 
 /**
@@ -379,9 +548,12 @@ async function handleProviderChange(e) {
       
       showNotification('success', 'Provider Switched', `Now using ${getProviderName(providerId)}`);
       
-      // Update rate limits if Gemini Cloud
+      // 🔥 NEW: Show/hide cache based on provider
       if (providerId === 'gemini_cloud') {
+        await initializeCacheUI();
         await updateRateLimits();
+      } else {
+        elements.cacheSection.classList.add('hidden');
       }
     } else {
       // Revert selection
@@ -422,6 +594,11 @@ async function handleModelChange(e) {
       
       // Update rate limits
       await updateRateLimits();
+      
+      // 🔥 NEW: Update cache display
+      if (state.currentProvider === 'gemini_cloud') {
+        await initializeCacheUI();
+      }
     } else {
       // Revert selection
       elements.modelSelect.value = state.currentModel;
@@ -486,6 +663,9 @@ async function handleExtractClick() {
       // Update rate limits
       if (state.currentProvider === 'gemini_cloud') {
         await updateRateLimits();
+        
+        // 🔥 NEW: Update cache after extraction
+        await initializeCacheUI();
       }
       
       showNotification('success', 'Extraction Complete', 
@@ -574,6 +754,7 @@ function getQualityLevel(score) {
 function getProviderName(providerId) {
   return providerId === 'chrome_ai' ? 'Chrome Built-in AI' : 'Gemini Cloud API';
 }
+
 /**
  * Update rate limits display
  */
@@ -865,7 +1046,7 @@ function openSettings() {
 }
 
 /**
- * Open history page
+ * 🔥 NEW: Open history page
  */
 function openHistory() {
   chrome.tabs.create({
@@ -890,6 +1071,7 @@ function openFeedback() {
     url: 'https://github.com/yourrepo/web-weaver/issues/new'
   });
 }
+
 /**
  * Listen for messages from background
  */
@@ -924,17 +1106,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'RATE_LIMIT_DISPLAY':
       handleRateLimitDisplay(data);
       break;
+      
+    // 🔥 NEW: Cache update message
+    case 'CACHE_UPDATED':
+      handleCacheUpdate(data);
+      break;
   }
   
   return true;
 });
+
+// 🔥 NEW: Handle cache update message
+async function handleCacheUpdate(data) {
+  if (state.currentProvider === 'gemini_cloud') {
+    await initializeCacheUI();
+  }
+}
 
 /**
  * Handle show notification message
  */
 function handleShowNotification(data) {
   if (!data || !data.notification) {
-    logger.warn('Invalid notification data');
+    console.warn('Invalid notification data');
     return;
   }
   const { notification } = data;
@@ -1059,30 +1253,3 @@ if (document.readyState === 'loading') {
 } else {
   initialize();
 }
-
-// TEST SCENARIOS:
-// 1. Popup opens and loads current state from background
-// 2. Theme toggle cycles through light → dark → auto
-// 3. Provider switch (Chrome AI ↔ Gemini Cloud)
-// 4. Model switch for Gemini Cloud
-// 5. Extraction mode change (extract_all ↔ extract_main)
-// 6. Content type change
-// 7. Extract button triggers extraction
-// 8. Progress shown during extraction
-// 9. Results displayed after successful extraction
-// 10. Results closed via close button
-// 11. Export JSON downloads file
-// 12. Export CSV converts and downloads file
-// 13. Copy JSON to clipboard
-// 14. Rate limits update after extraction
-// 15. Rate limit progress bars change color based on usage
-// 16. Countdown timer shown when rate limit hit
-// 17. API key warning shown when missing
-// 18. Notifications appear and auto-dismiss
-// 19. Notification manual dismiss
-// 20. Keyboard shortcuts (Ctrl+E, Ctrl+,, Escape)
-// 21. Settings page opens in new tab
-// 22. History page opens in new tab
-// 23. Help/Feedback links open external URLs
-// 24. Message listeners handle background notifications
-// 25. Quality score badge color based on score level

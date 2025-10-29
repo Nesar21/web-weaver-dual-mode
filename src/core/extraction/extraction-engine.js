@@ -1,4 +1,4 @@
-// VERSION: v1.0.0 | LAST UPDATED: 2025-10-26 | FEATURE: Extraction Engine Main Orchestrator
+// VERSION: v1.0.0 | LAST UPDATED: 2025-10-29 | FIX: Removed Screenshot Functions
 
 /**
  * Extraction Engine
@@ -44,12 +44,6 @@ export async function extractFromCurrentTab(options = {}) {
     // Preprocess HTML
     const html = await extractHTML(tab.id, mergedOptions);
 
-    // Capture screenshot if enabled
-    let screenshot = null;
-    if (mergedOptions.screenshot?.enabled && mergedOptions.mode === 'extract_main') {
-      screenshot = await captureScreenshot(tab.id, mergedOptions.screenshot);
-    }
-
     // Get AI provider and model
     const provider = await getCurrentProvider();
     const model = await getCurrentModel(provider);
@@ -57,7 +51,6 @@ export async function extractFromCurrentTab(options = {}) {
     // Perform extraction
     const extractedData = await performExtraction(
       html,
-      screenshot,
       mergedOptions,
       provider,
       model
@@ -227,83 +220,6 @@ function truncateHTML(html, maxSizeKB) {
 }
 
 /**
- * Capture screenshot from tab
- * @param {number} tabId - Tab ID
- * @param {Object} config - Screenshot config
- * @returns {Promise<string>} Screenshot data URL
- * @private
- */
-async function captureScreenshot(tabId, config) {
-  try {
-    logger.info('Capturing screenshot');
-
-    const dataUrl = await chrome.tabs.captureVisibleTab(null, {
-      format: config.format || 'png',
-      quality: config.quality || 90
-    });
-
-    // Resize if needed
-    const resized = await resizeScreenshot(dataUrl, config);
-
-    logger.info('Screenshot captured');
-    return resized;
-
-  } catch (error) {
-    logger.error('Screenshot capture failed', error);
-    return null; // Non-fatal, continue without screenshot
-  }
-}
-
-/**
- * Resize screenshot if exceeds max dimensions
- * @param {string} dataUrl - Screenshot data URL
- * @param {Object} config - Screenshot config
- * @returns {Promise<string>} Resized data URL
- * @private
- */
-async function resizeScreenshot(dataUrl, config) {
-  const maxWidth = config.max_width || 1920;
-  const maxHeight = config.max_height || 10000;
-
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      let width = img.width;
-      let height = img.height;
-
-      // Check if resize needed
-      if (width <= maxWidth && height <= maxHeight) {
-        resolve(dataUrl);
-        return;
-      }
-
-      // Calculate new dimensions
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width;
-        width = maxWidth;
-      }
-
-      if (height > maxHeight) {
-        width = (width * maxHeight) / height;
-        height = maxHeight;
-      }
-
-      // Resize using canvas
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-
-      resolve(canvas.toDataURL('image/png'));
-    };
-
-    img.src = dataUrl;
-  });
-}
-
-/**
  * Ensure content script is injected
  * @param {number} tabId - Tab ID
  * @returns {Promise<void>}
@@ -319,17 +235,17 @@ async function ensureContentScript(tabId) {
     logger.warn('Content script injection check failed', error);
   }
 }
+
 /**
  * Perform extraction using AI provider
  * @param {string} html - Preprocessed HTML
- * @param {string|null} screenshot - Screenshot data URL
  * @param {Object} options - Extraction options
  * @param {string} provider - Provider ID
  * @param {string} model - Model ID
  * @returns {Promise<any>} Extracted data
  * @private
  */
-async function performExtraction(html, screenshot, options, provider, model) {
+async function performExtraction(html, options, provider, model) {
   try {
     logger.info(`Performing extraction: ${options.mode} (${provider}/${model})`);
 
@@ -347,7 +263,7 @@ async function performExtraction(html, screenshot, options, provider, model) {
     if (provider === 'chrome_ai') {
       return await extractWithChromeAI(html, prompt, options);
     } else if (provider === 'gemini_cloud') {
-      return await extractWithGeminiCloud(html, screenshot, prompt, model, options);
+      return await extractWithGeminiCloud(html, prompt, model, options);
     } else {
       throw new Error(`Unknown provider: ${provider}`);
     }
@@ -386,39 +302,16 @@ async function extractWithChromeAI(html, prompt, options) {
 /**
  * Extract using Gemini Cloud
  * @param {string} html - HTML content
- * @param {string|null} screenshot - Screenshot data URL
  * @param {string} prompt - Extraction prompt
  * @param {string} model - Model ID
  * @param {Object} options - Options
  * @returns {Promise<any>} Extracted data
  * @private
  */
-async function extractWithGeminiCloud(html, screenshot, prompt, model, options) {
+async function extractWithGeminiCloud(html, prompt, model, options) {
   try {
     logger.info('Extracting with Gemini Cloud');
 
-    // Use vision if screenshot available and model supports it
-    if (screenshot && options.mode === 'extract_main') {
-      const supportsVision = await GeminiCloud.supportsVision(model);
-      
-      if (supportsVision) {
-        logger.info('Using multimodal extraction (HTML + screenshot)');
-        const result = await GeminiCloud.extractDataWithVision(
-          model,
-          html,
-          screenshot,
-          prompt,
-          {
-            temperature: 0.3,
-            timeout: options.timeout_seconds * 1000 || 60000
-          }
-        );
-        return result.data;
-      }
-    }
-
-    // Fallback to HTML-only extraction
-    logger.info('Using HTML-only extraction');
     const result = await GeminiCloud.extractData(model, html, prompt, {
       temperature: 0.3,
       timeout: options.timeout_seconds * 1000 || 60000
@@ -609,6 +502,7 @@ export async function exportAsCSV(data, mode, provider, model) {
     throw error;
   }
 }
+
 /**
  * Generate comparisons for extracted items
  * @param {Array} items - Items to compare
@@ -803,25 +697,3 @@ export function validateExtractionResult(data) {
     errors
   };
 }
-
-// TEST SCENARIOS:
-// 1. Extract from current tab (extract_all mode)
-// 2. Extract from current tab (extract_main mode with screenshot)
-// 3. HTML extraction and preprocessing (remove scripts, styles, comments)
-// 4. HTML size limit enforcement (truncate if >500KB)
-// 5. Screenshot capture and resize
-// 6. Content type auto-detection (products, articles, jobs, posts)
-// 7. Content type detection with low score (fallback to generic)
-// 8. Extraction with Chrome AI provider
-// 9. Extraction with Gemini Cloud provider (HTML only)
-// 10. Extraction with Gemini Cloud provider (HTML + screenshot)
-// 11. Quality score calculation
-// 12. Apply smart features (deduplication)
-// 13. Export as CSV (standard, data_scientist, custom modes)
-// 14. Generate comparisons (min 2 items)
-// 15. Generate recommendations with context
-// 16. Detect trends (min 10 items)
-// 17. Get extraction statistics (item count, field count, completeness)
-// 18. Validate extraction result (null, empty array, empty object)
-// 19. Error handling for all operations
-// 20. Logging for all stages (start, progress, complete, error)

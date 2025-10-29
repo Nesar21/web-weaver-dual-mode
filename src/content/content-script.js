@@ -1,10 +1,18 @@
-// VERSION: v1.0.0 | LAST UPDATED: 2025-10-26 | FEATURE: Content Script
+// VERSION: v1.1.0 | LAST UPDATED: 2025-10-29 | FEATURE: Content Script + Scroll Cache
 
 /**
  * Content Script
  * Runs in context of web pages to extract HTML and communicate with background
  * Provides page-level utilities for extraction engine
+ * NOW WITH SCROLL CACHE: Captures HTML on scroll for Gemini Cloud API
  */
+
+// 🔥 ScrollCache loaded globally from scroll-cache.js (loaded first in manifest)
+// No import needed - ScrollCache class is available
+
+// 🔥 Initialize ScrollCache instance
+let scrollCacheInstance = null;
+let isGeminiCloudProvider = false; // Set dynamically based on provider
 
 /**
  * Initialize content script
@@ -22,6 +30,86 @@ function initialize() {
   }).catch(() => {
     // Background may not be ready yet, ignore
   });
+
+  // 🔥 Check provider and initialize scroll cache if Gemini Cloud
+  checkProviderAndInitCache();
+}
+
+/**
+ * Check provider and initialize scroll cache (Gemini Cloud only)
+ */
+async function checkProviderAndInitCache() {
+  try {
+    // Get current provider from storage
+    const settings = await chrome.storage.sync.get('aiProvider');
+    const provider = settings.aiProvider || 'gemini-cloud';
+    
+    isGeminiCloudProvider = (provider === 'gemini-cloud');
+    
+    if (isGeminiCloudProvider) {
+      // Initialize ScrollCache for Gemini Cloud
+      scrollCacheInstance = new ScrollCache();
+      scrollCacheInstance.updateURL(window.location.href);
+      
+      // Setup scroll listener
+      setupScrollListener();
+      
+      console.log('[Web Weaver] Scroll cache initialized for Gemini Cloud');
+    } else {
+      console.log('[Web Weaver] Chrome AI detected - scroll cache disabled');
+    }
+  } catch (error) {
+    console.error('[Web Weaver] Failed to check provider', error);
+  }
+}
+
+/**
+ * Setup scroll event listener (Gemini Cloud only)
+ */
+function setupScrollListener() {
+  let scrollTimeout;
+  
+  window.addEventListener('scroll', () => {
+    // Debounce scroll events (500ms delay)
+    clearTimeout(scrollTimeout);
+    
+    scrollTimeout = setTimeout(async () => {
+      if (isGeminiCloudProvider && scrollCacheInstance) {
+        await captureAndCacheHTML();
+      }
+    }, 500);
+  }, { passive: true });
+  
+  console.log('[Web Weaver] Scroll listener active');
+}
+
+/**
+ * Capture visible HTML and add to cache
+ */
+async function captureAndCacheHTML() {
+  try {
+    // Get current visible HTML
+    const visibleHTML = getPageHTML();
+    
+    // Add to cache
+    const result = await scrollCacheInstance.addItem(visibleHTML, {
+      timestamp: Date.now(),
+      url: window.location.href,
+      scrollY: window.scrollY
+    });
+    
+    // Notify popup of cache update
+    chrome.runtime.sendMessage({
+      type: 'CACHE_UPDATED',
+      cacheSize: scrollCacheInstance.getCacheSize()
+    }).catch(() => {
+      // Popup may not be open, ignore
+    });
+    
+    console.log(`[Web Weaver] Cache updated: ${result.itemCount} items, ${result.totalKB} KB`);
+  } catch (error) {
+    console.error('[Web Weaver] Cache capture failed', error);
+  }
 }
 
 /**
@@ -54,6 +142,32 @@ function handleMessage(message, sender, sendResponse) {
         success: true,
         metadata: getPageMetadata()
       });
+      break;
+
+    // 🔥 NEW: Get scroll cache (Gemini Cloud only)
+    case 'GET_SCROLL_CACHE':
+      if (isGeminiCloudProvider && scrollCacheInstance) {
+        sendResponse({
+          success: true,
+          cache: scrollCacheInstance.getAllItems(),
+          cacheSize: scrollCacheInstance.getCacheSize()
+        });
+      } else {
+        sendResponse({
+          success: false,
+          message: 'Scroll cache not available (Chrome AI mode or cache disabled)'
+        });
+      }
+      break;
+
+    // 🔥 NEW: Clear scroll cache
+    case 'CLEAR_SCROLL_CACHE':
+      if (scrollCacheInstance) {
+        scrollCacheInstance.clearCache();
+        sendResponse({ success: true });
+      } else {
+        sendResponse({ success: false });
+      }
       break;
       
     case 'HIGHLIGHT_ELEMENTS':
@@ -355,3 +469,8 @@ if (typeof module !== 'undefined' && module.exports) {
 // 14. Message passing between content script and background
 // 15. CONTENT_SCRIPT_READY notification sent on load
 // 16. PAGE_LOADED notification sent after full load
+// 🔥 NEW: 17. Scroll cache captures HTML on scroll (Gemini Cloud only)
+// 🔥 NEW: 18. GET_SCROLL_CACHE returns cached items
+// 🔥 NEW: 19. CLEAR_SCROLL_CACHE clears cache
+// 🔥 NEW: 20. CACHE_UPDATED notifications sent to popup
+// 🔥 NEW: 21. Chrome AI mode bypasses scroll cache completely

@@ -1,4 +1,4 @@
-// VERSION: v3.0.5 | FIXED WITH TOKEN LIMITER + HTML TRUNCATION | LAST UPDATED: 2025-10-29
+// VERSION: v3.0.6 | TEXT-ONLY MODE | LAST UPDATED: 2025-10-29
 // [EXPERIMENTAL] This provider uses Chrome's experimental AI APIs
 
 /**
@@ -14,7 +14,7 @@ import { createLogger } from '../../../utils/logger.js';
 import { getEndpointsConfig } from '../../../utils/config-loader.js';
 import { handleAIProviderError } from '../../error-handling/error-handler.js';
 import { recoverFromChromeAITimeout } from '../../error-handling/error-recovery.js';
-import { parseJSON } from '../../../utils/json-parser-chrome.js'; // ✅ FIXED: Static import for Service Worker compatibility
+import { parseJSON } from '../../../utils/json-parser-chrome.js';
 
 const logger = createLogger('ChromeAI');
 
@@ -23,7 +23,6 @@ const logger = createLogger('ChromeAI');
  * @returns {boolean} True if Chrome AI is available
  */
 export function isChromeAIAvailable() {
-  // ✅ FIXED: Check self.LanguageModel instead of window.ai
   return typeof self !== 'undefined' && self.LanguageModel !== undefined;
 }
 
@@ -38,7 +37,6 @@ async function createLanguageModelSession(options = {}) {
   }
 
   try {
-    // ✅ FIXED: Use self.LanguageModel.create()
     const session = await self.LanguageModel.create({
       temperature: options.temperature || 0.7,
       topK: options.topK || 40
@@ -65,10 +63,8 @@ export async function generateText(prompt, options = {}) {
   try {
     logger.info('Generating text with Chrome AI');
 
-    // Create session
     session = await createLanguageModelSession(options);
 
-    // Generate with timeout
     const timeout = options.timeout || 30000;
     const response = await Promise.race([
       session.prompt(prompt),
@@ -86,7 +82,6 @@ export async function generateText(prompt, options = {}) {
     throw new Error(handled.userMessage);
 
   } finally {
-    // Cleanup session
     if (session && typeof session.destroy === 'function') {
       try {
         session.destroy();
@@ -148,7 +143,6 @@ export async function generateTextStream(prompt, onChunk, options = {}) {
  * @returns {Promise<string>} Summary
  */
 export async function summarizeText(text, options = {}) {
-  // ✅ FIXED: Check self.Summarizer
   if (!self.Summarizer) {
     throw new Error('Chrome Summarizer API not available');
   }
@@ -158,21 +152,17 @@ export async function summarizeText(text, options = {}) {
   try {
     logger.info('Summarizing text with Chrome AI');
 
-    // Check availability
     const availability = await self.Summarizer.availability();
-    // ✅ FIXED: Check for 'available' not 'no'
     if (availability !== 'available') {
       throw new Error('Summarizer not available on this device');
     }
 
-    // Create summarizer
     summarizer = await self.Summarizer.create({
       type: options.type || 'tl;dr',
       format: options.format || 'plain-text',
       length: options.length || 'medium'
     });
 
-    // Summarize
     const summary = await summarizer.summarize(text);
 
     logger.info('Text summarized successfully');
@@ -202,7 +192,6 @@ export async function summarizeText(text, options = {}) {
  * @returns {Promise<string>} Translated text
  */
 export async function translateText(text, targetLanguage, sourceLanguage = null) {
-  // ✅ FIXED: Check self.Translator
   if (!self.Translator) {
     throw new Error('Chrome Translator API not available');
   }
@@ -212,17 +201,14 @@ export async function translateText(text, targetLanguage, sourceLanguage = null)
   try {
     logger.info(`Translating text to ${targetLanguage}`);
 
-    // Check availability
     const availability = await self.Translator.availability({
       sourceLanguage: sourceLanguage || 'en',
       targetLanguage
     });
-    // ✅ FIXED: Check for 'available' not 'no'
     if (availability !== 'available') {
       throw new Error('Translator not available on this device');
     }
 
-    // Create translator
     const config = {
       targetLanguage
     };
@@ -232,7 +218,6 @@ export async function translateText(text, targetLanguage, sourceLanguage = null)
 
     translator = await self.Translator.create(config);
 
-    // Translate
     const translated = await translator.translate(text);
 
     logger.info('Text translated successfully');
@@ -260,7 +245,6 @@ export async function translateText(text, targetLanguage, sourceLanguage = null)
  * @returns {Promise<Array<Object>>} Language detection results [{language: string, confidence: number}]
  */
 export async function detectLanguage(text) {
-  // ✅ FIXED: Check self.LanguageDetector
   if (!self.LanguageDetector) {
     throw new Error('Chrome LanguageDetector API not available');
   }
@@ -270,17 +254,13 @@ export async function detectLanguage(text) {
   try {
     logger.info('Detecting language with Chrome AI');
 
-    // Check availability
     const availability = await self.LanguageDetector.availability();
-    // ✅ FIXED: Check for 'available' not 'no'
     if (availability !== 'available') {
       throw new Error('Language detector not available on this device');
     }
 
-    // Create detector
     detector = await self.LanguageDetector.create();
 
-    // Detect
     const results = await detector.detect(text);
 
     logger.info('Language detected successfully', results);
@@ -313,7 +293,6 @@ function truncateHTML(html, maxChars = 15000) {
     return html;
   }
   
-  // Truncate and add warning
   const truncated = html.substring(0, maxChars);
   logger.warn(`HTML truncated from ${html.length} to ${maxChars} characters due to Chrome AI context limits`);
   return truncated + '\n\n[...content truncated due to Chrome AI size limits...]';
@@ -330,19 +309,15 @@ export async function extractData(html, prompt, options) {
   try {
     logger.info('Extracting data with Chrome AI');
     
-    // ✅ NEW: Truncate HTML for Chrome AI's small context window (~4000 tokens)
     const truncatedHTML = truncateHTML(html, 15000);
     
-    // Build full prompt with truncated HTML
     const fullPrompt = `${prompt}\n\n${truncatedHTML}`;
     
-    // Generate response
     const response = await generateText(fullPrompt, {
       temperature: options.temperature || 0.3,
       timeout: options.timeout || 60000
     });
     
-    // ✅ FIXED: Use parseJSON (now statically imported at top)
     const parseResult = parseJSON(response);
     
     if (!parseResult.success) {
@@ -352,7 +327,7 @@ export async function extractData(html, prompt, options) {
     logger.info('Data extracted successfully');
     return {
       data: parseResult.data,
-      confidence: options.confidence || 85 // Chrome AI doesn't provide confidence scores
+      confidence: options.confidence || 85
     };
     
   } catch (error) {
@@ -371,16 +346,13 @@ export async function calculateQualityScore(extractedData, prompt) {
   try {
     logger.info('Calculating quality score with Chrome AI');
 
-    // Build prompt with extracted data
     const fullPrompt = `${prompt}\n\nEXTRACTED DATA:\n${JSON.stringify(extractedData, null, 2)}`;
 
-    // Generate response
     const response = await generateText(fullPrompt, {
       temperature: 0.1,
       timeout: 30000
     });
 
-    // Parse quality score response
     const scoreResult = JSON.parse(response);
 
     logger.info('Quality score calculated', scoreResult);
@@ -406,22 +378,18 @@ export async function checkCapabilities() {
   };
 
   try {
-    // Language Model
     if (self.LanguageModel) {
       const lmAvail = await self.LanguageModel.availability();
-      // ✅ FIXED: Check for 'available' not 'readily'
       capabilities.languageModel = (lmAvail === 'available');
       capabilities.details.languageModel = { available: lmAvail };
     }
 
-    // Summarizer
     if (self.Summarizer) {
       const sumAvail = await self.Summarizer.availability();
       capabilities.summarizer = (sumAvail === 'available');
       capabilities.details.summarizer = { available: sumAvail };
     }
 
-    // Translator
     if (self.Translator) {
       const transAvail = await self.Translator.availability({ 
         sourceLanguage: 'en', 
@@ -431,7 +399,6 @@ export async function checkCapabilities() {
       capabilities.details.translator = { available: transAvail };
     }
 
-    // Language Detector
     if (self.LanguageDetector) {
       const detAvail = await self.LanguageDetector.availability();
       capabilities.languageDetector = (detAvail === 'available');
@@ -453,7 +420,6 @@ export async function checkCapabilities() {
  */
 export async function getModelInfo() {
   try {
-    // ✅ FIXED: Check self.LanguageModel
     if (!self.LanguageModel) {
       return null;
     }
@@ -466,7 +432,7 @@ export async function getModelInfo() {
       provider: 'chrome_ai',
       available: (availability === 'available'),
       maxTokens: 8192,
-      contextLimit: 4000, // ✅ NEW: Added context limit info
+      contextLimit: 4000,
       defaultTemperature: 0.7,
       defaultTopK: 40
     };

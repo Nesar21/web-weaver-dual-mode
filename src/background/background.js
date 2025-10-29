@@ -1,4 +1,4 @@
-// VERSION: v1.0.0 | LAST UPDATED: 2025-10-27 | FEATURE: Background Service Worker
+// VERSION: v1.1.1 | LAST UPDATED: 2025-10-29 | FEATURE: Background Service Worker + Cache Cleanup + Screenshot Support
 
 /**
  * Background Service Worker
@@ -116,6 +116,68 @@ async function initialize() {
   }
 }
 
+// ✅ NEW: Tab close handler - Clear cache when tab closes
+chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+  try {
+    logger.debug(`Tab ${tabId} closed, clearing cache if exists`);
+    
+    // Send message to content script to clear cache
+    // (This will fail silently if tab already closed, which is fine)
+    chrome.tabs.sendMessage(tabId, {
+      type: 'CLEAR_CACHE'
+    }).catch(() => {
+      // Ignore errors - tab is already gone
+      logger.debug(`Tab ${tabId} cache clear skipped - tab already closed`);
+    });
+    
+  } catch (error) {
+    logger.debug('Tab close cache cleanup error (expected)', error);
+  }
+});
+
+// ✅ NEW: Navigation handler - Clear cache on navigation
+chrome.webNavigation.onCommitted.addListener(async (details) => {
+  // Only clear cache on main frame navigations (not iframes)
+  if (details.frameId !== 0) {
+    return;
+  }
+  
+  // Only clear on actual navigation (not history/reload)
+  const clearTransitionTypes = [
+    'link',
+    'typed',
+    'auto_bookmark',
+    'form_submit'
+  ];
+  
+  if (!clearTransitionTypes.includes(details.transitionType)) {
+    return;
+  }
+  
+  try {
+    logger.debug(`Navigation detected on tab ${details.tabId}, clearing cache`);
+    
+    // Wait a bit for content script to load
+    setTimeout(async () => {
+      try {
+        const response = await chrome.tabs.sendMessage(details.tabId, {
+          type: 'CLEAR_CACHE'
+        });
+        
+        if (response && response.success) {
+          logger.debug(`Cache cleared for tab ${details.tabId}`);
+        }
+      } catch (error) {
+        // Content script may not be ready yet, that's ok
+        logger.debug(`Cache clear on navigation skipped for tab ${details.tabId}`);
+      }
+    }, 500);
+    
+  } catch (error) {
+    logger.debug('Navigation cache cleanup error', error);
+  }
+});
+
 /**
  * Message handler
  */
@@ -176,6 +238,17 @@ async function handleMessage(message, sender) {
       
     case 'APPLY_SMART_FEATURES':
       return await handleSmartFeaturesMessage(data);
+      
+    // ✅ NEW: Screenshot capture handler
+    case 'CAPTURE_SCREENSHOT':
+      return await handleCaptureScreenshotMessage();
+      
+    // Cache management messages
+    case 'CACHE_CLEARED':
+      return await handleCacheClearedMessage(data);
+      
+    case 'CACHE_FULL_WARNING':
+      return await handleCacheFullWarningMessage(data);
       
     case 'PING':
       return { success: true, message: 'pong' };
@@ -346,6 +419,80 @@ async function handleSmartFeaturesMessage(data) {
     return { success: true, data: processed };
   } catch (error) {
     logger.error('Failed to apply smart features', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * ✅ NEW: Handle screenshot capture request
+ */
+async function handleCaptureScreenshotMessage() {
+  try {
+    logger.info('Capturing screenshot');
+    
+    // Capture screenshot from active tab
+    const screenshot = await chrome.tabs.captureVisibleTab(null, {
+      format: 'png',
+      quality: 90
+    });
+    
+    logger.info('Screenshot captured successfully');
+    return { success: true, screenshot };
+    
+  } catch (error) {
+    logger.error('Screenshot capture failed', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Handle cache cleared notification
+ */
+async function handleCacheClearedMessage(data) {
+  try {
+    logger.debug(`Cache cleared: ${data.reason || 'manual'}`);
+    
+    // Notify popup if open
+    try {
+      chrome.runtime.sendMessage({
+        type: 'CACHE_UPDATED',
+        data: { cleared: true }
+      });
+    } catch (error) {
+      // Popup might not be open, that's ok
+    }
+    
+    return { success: true };
+  } catch (error) {
+    logger.error('Cache cleared handler failed', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Handle cache full warning
+ */
+async function handleCacheFullWarningMessage(data) {
+  try {
+    logger.warn(`Cache full warning: ${data.percentage}%`);
+    
+    // Notify popup if open
+    try {
+      chrome.runtime.sendMessage({
+        type: 'CACHE_WARNING',
+        data: {
+          percentage: data.percentage,
+          currentKB: data.currentKB,
+          limitKB: data.limitKB
+        }
+      });
+    } catch (error) {
+      // Popup might not be open, that's ok
+    }
+    
+    return { success: true };
+  } catch (error) {
+    logger.error('Cache full warning handler failed', error);
     return { success: false, error: error.message };
   }
 }

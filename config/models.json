@@ -77,9 +77,9 @@
           "capabilities": ["extraction", "deduplication", "csv_formatting", "comparisons", "recommendations", "trends"]
         },
         "pro": {
-          "id": "gemini-1.5-pro",
-          "name": "gemini-1.5-pro",
-          "display_name": "ADVANCED (Pro 1.5)",
+          "id": "gemini-2.5-pro",
+          "name": "gemini-2.5-pro",
+          "display_name": "ADVANCED (Pro 2.5)",
           "tier": "MAX",
           "context_window": 2000000,
           "max_output_tokens": 8192,
