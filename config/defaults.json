@@ -1,0 +1,161 @@
+{
+  "extension": {
+    "first_run": true,
+    "version": "1.0.0",
+    "onboarding_completed": false,
+    "privacy_accepted": false,
+    "last_update_check": null
+  },
+
+  "ai_provider": {
+    "selected_provider": "chrome_ai",
+    "selected_model": {
+      "chrome_ai": "gemini_nano",
+      "gemini_cloud": "gemini-2.0-flash-lite"
+    },
+    "fallback_enabled": false,
+    "auto_switch_on_failure": false
+  },
+
+  "api_keys": {
+    "gemini_cloud": {
+      "key": null,
+      "remember_me": false,
+      "storage_type": "session",
+      "encrypted": true,
+      "last_validated": null,
+      "validation_status": "unchecked"
+    }
+  },
+
+  "extraction": {
+    "mode": "extract_all",
+    "content_type": "auto",
+    "preprocessing": {
+      "remove_scripts": true,
+      "remove_styles": true,
+      "remove_comments": true,
+      "remove_navigation": false,
+      "remove_footer": false,
+      "max_html_size_kb": 500
+    },
+    "screenshot": {
+      "enabled": true,
+      "format": "png",
+      "quality": 90,
+      "max_width": 1920,
+      "max_height": 10000
+    },
+    "timeout_seconds": 60,
+    "retry_on_failure": true,
+    "max_retries": 2
+  },
+
+  "smart_features": {
+    "deduplication": {
+      "enabled": false,
+      "scope": "per_page",
+      "similarity_threshold": 85,
+      "keep_first": true
+    },
+    "quality_score": {
+      "enabled": true,
+      "show_badge": true,
+      "min_acceptable_score": 60
+    },
+    "comparisons": {
+      "enabled": false,
+      "auto_trigger": false,
+      "min_items": 2
+    },
+    "recommendations": {
+      "enabled": false,
+      "context": "general",
+      "max_recommendations": 5
+    },
+    "trends": {
+      "enabled": false,
+      "min_items": 10
+    }
+  },
+
+  "export": {
+    "default_format": "json",
+    "csv_mode": "standard",
+    "include_metadata": true,
+    "filename_template": "web-weaver-{timestamp}",
+    "auto_download": false,
+    "clipboard": {
+      "show_confirmation": true,
+      "confirmation_duration_ms": 2000
+    }
+  },
+
+  "ui": {
+    "theme": "auto",
+    "animations": {
+      "enabled": true,
+      "extraction_animation": true,
+      "fade_in_results": true,
+      "duration_ms": 300
+    },
+    "audio_feedback": {
+      "enabled": true,
+      "volume": 0.3,
+      "events": {
+        "extraction_start": true,
+        "extraction_complete": true,
+        "error": true
+      }
+    },
+    "notifications": {
+      "enabled": true,
+      "position": "top-right",
+      "duration_ms": 3000,
+      "show_quality_alerts": true
+    },
+    "progress_tracking": {
+      "show_live_progress": true,
+      "show_streaming_results": true,
+      "update_interval_ms": 100
+    }
+  },
+
+  "rate_limiting": {
+    "show_counters": true,
+    "show_progress_bars": true,
+    "show_warnings": true,
+    "auto_suggest_model_switch": true,
+    "countdown_timer": true
+  },
+
+  "privacy": {
+    "local_processing_preferred": true,
+    "no_external_tracking": true,
+    "no_data_collection": true,
+    "encryption_enabled": true
+  },
+
+  "advanced": {
+    "debug_mode": false,
+    "log_level": "error",
+    "experimental_features": false,
+    "custom_prompts_enabled": false,
+    "content_classification": true,
+    "schema_generation": true
+  },
+
+  "storage": {
+    "max_history_items": 50,
+    "auto_cleanup": true,
+    "cleanup_days": 30,
+    "compress_storage": false
+  },
+
+  "performance": {
+    "max_concurrent_extractions": 1,
+    "cache_prompts": true,
+    "cache_duration_minutes": 60,
+    "lazy_load_ui": true
+  }
+}

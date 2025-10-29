@@ -1,0 +1,402 @@
+/* VERSION: v1.0.0 | LAST UPDATED: 2025-10-26 | FEATURE: Onboarding Page Styles */
+
+/* Import base styles */
+@import url('../popup/popup.css');
+
+/* ========================================
+   Base Overrides
+   ======================================== */
+body {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
+}
+
+/* ========================================
+   Onboarding Container
+   ======================================== */
+.onboarding-container {
+  width: 100%;
+  max-width: 800px;
+  margin: var(--spacing-2xl);
+  padding: var(--spacing-2xl);
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   Progress Indicator
+   ======================================== */
+.progress-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex: 0 0 auto;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  transition: all var(--transition-base);
+}
+
+.progress-step.active .step-number {
+  background-color: var(--color-primary);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.progress-step.completed .step-number {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.progress-step.active .step-label {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.progress-line {
+  flex: 1;
+  height: 2px;
+  background-color: var(--color-border);
+  margin: 0 var(--spacing-sm);
+}
+
+/* ========================================
+   Step Content
+   ======================================== */
+.step-content {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.step-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-lg);
+}
+
+.step-header h1 {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: var(--color-text-secondary);
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--color-success);
+  color: white;
+  font-size: 3rem;
+  font-weight: 300;
+}
+
+/* ========================================
+   Features Grid
+   ======================================== */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.feature-card {
+  padding: var(--spacing-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.feature-card:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(59, 130, 246, 0.02);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.feature-card h3 {
+  font-size: 1rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.feature-card p {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ========================================
+   Provider Options
+   ======================================== */
+.provider-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.provider-card {
+  display: block;
+  padding: var(--spacing-xl);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.provider-card:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(59, 130, 246, 0.02);
+}
+
+.provider-card input[type="radio"] {
+  display: none;
+}
+
+.provider-card:has(input[type="radio"]:checked) {
+  border-color: var(--color-primary);
+  background-color: rgba(59, 130, 246, 0.05);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.provider-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.provider-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.provider-header h3 {
+  flex: 1;
+  margin: 0;
+}
+
+.badge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+}
+
+.badge-recommended {
+  color: var(--color-success);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.badge-advanced {
+  color: var(--color-primary);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.provider-description {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.provider-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.875rem;
+}
+
+.check-icon {
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+.provider-status {
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.status-text {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+/* ========================================
+   Setup Section
+   ======================================== */
+.setup-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.info-box {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background-color: rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  border-radius: var(--radius-md);
+}
+
+.info-icon {
+  color: var(--color-info);
+  flex-shrink: 0;
+}
+
+.info-box h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.info-box p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+/* ========================================
+   Tips Section
+   ======================================== */
+.tips-section {
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-xl);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.tips-section h3 {
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.tips-list {
+  margin: 0;
+  padding-left: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.tips-list li {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* ========================================
+   Step Actions
+   ======================================== */
+.step-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
+.btn-icon-left {
+  margin-right: var(--spacing-xs);
+}
+
+.btn-icon-right {
+  margin-left: var(--spacing-xs);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 768px) {
+  .onboarding-container {
+    margin: var(--spacing-lg);
+    padding: var(--spacing-lg);
+  }
+  
+  .progress-indicator {
+    overflow-x: auto;
+  }
+  
+  .step-label {
+    display: none;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .provider-features {
+    grid-template-columns: 1fr;
+  }
+  
+  .step-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .step-actions .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "manifest_version": 3,
+  "name": "Web Weaver Lightning",
+  "version": "1.0.0",
+  "description": "Intelligent web data extraction powered by AI. Extract structured data from any webpage using Chrome Built-in AI or Gemini Cloud API.",
+  "author": "Your Name",
+  
+  "icons": {
+    "16": "src/assets/icons/icon16.png",
+    "32": "src/assets/icons/icon32.png",
+    "48": "src/assets/icons/icon48.png",
+    "128": "src/assets/icons/icon128.png"
+  },
+  
+  "action": {
+    "default_popup": "src/ui/popup/popup.html",
+    "default_icon": {
+      "16": "src/assets/icons/icon16.png",
+      "32": "src/assets/icons/icon32.png",
+      "48": "src/assets/icons/icon48.png",
+      "128": "src/assets/icons/icon128.png"
+    },
+    "default_title": "Web Weaver - Extract Data"
+  },
+  
+  "background": {
+    "service_worker": "src/background/background.js",
+    "type": "module"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "downloads"
+  ],
+  
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  
+  "optional_permissions": [
+    "clipboardWrite"
+  ],
+  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "config/*.json",
+        "src/assets/icons/*.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  
+  "options_page": "src/ui/settings/settings.html",
+  
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E",
+        "mac": "Command+Shift+E"
+      },
+      "description": "Open Web Weaver popup"
+    },
+    "extract_all": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+A",
+        "mac": "Command+Shift+A"
+      },
+      "description": "Extract all items from current page"
+    }
+  },
+  
+  "minimum_chrome_version": "128",
+  
+  "incognito": "split",
+  
+  "offline_enabled": true
+}

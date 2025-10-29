@@ -1,0 +1,109 @@
+{
+  "gemini_cloud": {
+    "base_url": "https://generativelanguage.googleapis.com",
+    "api_version": "v1beta",
+    "endpoints": {
+      "generate_content": {
+        "path": "/models/{model}:generateContent",
+        "method": "POST",
+        "description": "Generate content from text and/or images",
+        "supports_vision": true,
+        "timeout_ms": 60000
+      },
+      "stream_generate_content": {
+        "path": "/models/{model}:streamGenerateContent",
+        "method": "POST",
+        "description": "Stream generated content in real-time",
+        "supports_vision": true,
+        "timeout_ms": 120000,
+        "experimental": true
+      },
+      "count_tokens": {
+        "path": "/models/{model}:countTokens",
+        "method": "POST",
+        "description": "Count tokens in prompt",
+        "supports_vision": false,
+        "timeout_ms": 5000
+      }
+    },
+    "authentication": {
+      "method": "query_parameter",
+      "parameter_name": "key",
+      "header_alternative": false
+    },
+    "request_format": {
+      "content_type": "application/json",
+      "structure": {
+        "contents": "array of content objects",
+        "generationConfig": "optional generation parameters",
+        "safetySettings": "optional safety filters"
+      }
+    },
+    "response_format": {
+      "success": {
+        "status_code": 200,
+        "structure": {
+          "candidates": "array of response candidates",
+          "promptFeedback": "safety and filter information"
+        }
+      },
+      "error": {
+        "status_codes": {
+          "400": "Invalid request format",
+          "401": "Invalid or missing API key",
+          "403": "API key lacks permissions",
+          "404": "Model not found",
+          "429": "Rate limit exceeded",
+          "500": "Server error",
+          "503": "Service unavailable"
+        }
+      }
+    }
+  },
+  "chrome_ai": {
+    "type": "browser_api",
+    "namespace": "window.ai",
+    "apis": {
+      "language_model": {
+        "check": "window.ai?.languageModel",
+        "create": "window.ai.languageModel.create",
+        "capabilities": "window.ai.languageModel.capabilities",
+        "description": "Text generation and extraction"
+      },
+      "summarizer": {
+        "check": "window.ai?.summarizer",
+        "create": "window.ai.summarizer.create",
+        "capabilities": "window.ai.summarizer.capabilities",
+        "description": "Text summarization"
+      },
+      "translator": {
+        "check": "window.ai?.translator",
+        "create": "window.ai.translator.create",
+        "capabilities": "window.ai.translator.capabilities",
+        "description": "Language translation"
+      },
+      "language_detector": {
+        "check": "window.ai?.languageDetector",
+        "create": "window.ai.languageDetector.create",
+        "capabilities": "window.ai.languageDetector.capabilities",
+        "description": "Language detection"
+      }
+    },
+    "requirements": {
+      "chrome_version": "120+",
+      "flags": [
+        "chrome://flags/#optimization-guide-on-device-model",
+        "chrome://flags/#prompt-api-for-gemini-nano"
+      ],
+      "download_required": true,
+      "download_size_mb": "~1.5GB",
+      "download_automatic": false
+    }
+  },
+  "error_handling": {
+    "retry_on_codes": [429, 500, 503],
+    "max_retries": 3,
+    "timeout_strategy": "exponential_backoff",
+    "user_notification": true
+  }
+}

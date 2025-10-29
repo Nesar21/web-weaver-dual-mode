@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "data": [
+    {
+      "title": "Example Product 1",
+      "price": "$29.99",
+      "description": "High-quality product description",
+      "rating": 4.5,
+      "reviews": 127
+    },
+    {
+      "title": "Example Product 2",
+      "price": "$39.99",
+      "description": "Another great product",
+      "rating": 4.8,
+      "reviews": 89
+    }
+  ],
+  "metadata": {
+    "itemCount": 2,
+    "contentType": "products",
+    "extractionMode": "extract_all",
+    "duration": 2341,
+    "timestamp": "2025-10-26T13:42:00.000Z"
+  },
+  "qualityScore": 92
+}

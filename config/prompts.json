@@ -1,0 +1,178 @@
+{
+  "extraction_modes": {
+    "extract_all": {
+      "id": "extract_all",
+      "name": "Extract All Items",
+      "description": "Extract all items from the page (feeds, lists, search results)",
+      "input_type": "html_only",
+      "supports_vision": false,
+      "use_cases": ["product listings", "search results", "social feeds", "article lists"]
+    },
+    "extract_main": {
+      "id": "extract_main",
+      "name": "Extract Main Article",
+      "description": "Extract the primary content from the page",
+      "input_type": "html_and_screenshot",
+      "supports_vision": true,
+      "use_cases": ["single article", "product detail", "profile page", "single post"]
+    }
+  },
+
+  "content_types": {
+    "products": {
+      "id": "products",
+      "name": "Products",
+      "icon": "🛍️",
+      "keywords": ["product", "item", "price", "cart", "buy", "shop", "store", "amazon", "ebay"],
+      "schema": {
+        "title": "string",
+        "price": "string",
+        "currency": "string",
+        "rating": "string",
+        "reviews_count": "string",
+        "availability": "string",
+        "description": "string",
+        "image_url": "string",
+        "brand": "string",
+        "category": "string",
+        "sku": "string",
+        "url": "string"
+      },
+      "extract_all_prompt": "You are a precise data extraction specialist. Extract ALL products from this HTML.\n\nINSTRUCTIONS:\n1. Find every product listing on the page\n2. Extract complete information for each product\n3. Preserve exact prices with currency symbols\n4. Extract ratings as displayed (e.g., '4.5', '4.5/5', '4.5 stars')\n5. Keep review counts as numbers (e.g., '1,234' or '1234')\n6. Include product URLs (full or relative paths)\n7. Extract brand names exactly as shown\n8. Capture availability status ('In Stock', 'Out of Stock', 'Limited', etc.)\n9. If multiple sizes/colors exist for one product, treat each as separate item\n10. Return ONLY valid JSON array, no explanations\n\nOUTPUT FORMAT:\n[\n  {\n    \"title\": \"Product name\",\n    \"price\": \"$99.99\",\n    \"currency\": \"USD\",\n    \"rating\": \"4.5\",\n    \"reviews_count\": \"1234\",\n    \"availability\": \"In Stock\",\n    \"description\": \"Brief description\",\n    \"image_url\": \"https://...\",\n    \"brand\": \"Brand Name\",\n    \"category\": \"Category\",\n    \"sku\": \"SKU123\",\n    \"url\": \"/product/...\"\n  }\n]\n\nHTML:\n{html}",
+      
+      "extract_main_prompt": "You are a precise data extraction specialist. Extract the MAIN product from this page.\n\nINSTRUCTIONS:\n1. Identify the primary product being displayed\n2. Extract complete product information\n3. Use both HTML and screenshot for accuracy\n4. Screenshot helps identify primary content and visual hierarchy\n5. Preserve exact prices, ratings, and availability\n6. Extract full product description\n7. Capture all product specifications/features if present\n8. Return ONLY valid JSON object, no explanations\n\nOUTPUT FORMAT:\n{\n  \"title\": \"Product name\",\n  \"price\": \"$99.99\",\n  \"currency\": \"USD\",\n  \"rating\": \"4.5\",\n  \"reviews_count\": \"1234\",\n  \"availability\": \"In Stock\",\n  \"description\": \"Full description\",\n  \"image_url\": \"https://...\",\n  \"brand\": \"Brand Name\",\n  \"category\": \"Category\",\n  \"sku\": \"SKU123\",\n  \"url\": \"/product/...\",\n  \"specifications\": {\n    \"key\": \"value\"\n  }\n}\n\nHTML:\n{html}\n\nSCREENSHOT: Provided as image input"
+    },
+    "articles": {
+      "id": "articles",
+      "name": "Articles",
+      "icon": "📄",
+      "keywords": ["article", "blog", "post", "news", "story", "medium", "read", "author"],
+      "schema": {
+        "title": "string",
+        "author": "string",
+        "published_date": "string",
+        "content": "string",
+        "excerpt": "string",
+        "read_time": "string",
+        "tags": "array",
+        "category": "string",
+        "url": "string",
+        "image_url": "string"
+      },
+      "extract_all_prompt": "You are a precise data extraction specialist. Extract ALL articles from this HTML.\n\nINSTRUCTIONS:\n1. Find every article/blog post on the page\n2. Extract title, author, date, and excerpt\n3. Preserve published dates in original format\n4. Extract read time if available (e.g., '5 min read')\n5. Capture tags/categories as arrays\n6. Include article URLs\n7. Extract featured image URLs\n8. Keep excerpts concise (first 2-3 sentences)\n9. Return ONLY valid JSON array, no explanations\n\nOUTPUT FORMAT:\n[\n  {\n    \"title\": \"Article title\",\n    \"author\": \"Author name\",\n    \"published_date\": \"Oct 26, 2025\",\n    \"content\": \"\",\n    \"excerpt\": \"Brief excerpt...\",\n    \"read_time\": \"5 min\",\n    \"tags\": [\"tag1\", \"tag2\"],\n    \"category\": \"Category\",\n    \"url\": \"/article/...\",\n    \"image_url\": \"https://...\"\n  }\n]\n\nHTML:\n{html}",
+      
+      "extract_main_prompt": "You are a precise data extraction specialist. Extract the MAIN article from this page.\n\nINSTRUCTIONS:\n1. Identify the primary article content\n2. Extract complete article text (all paragraphs)\n3. Use screenshot to identify main content area\n4. Preserve paragraph structure\n5. Extract title, author, date, and metadata\n6. Capture all tags and categories\n7. Include read time if present\n8. Return ONLY valid JSON object, no explanations\n\nOUTPUT FORMAT:\n{\n  \"title\": \"Article title\",\n  \"author\": \"Author name\",\n  \"published_date\": \"Oct 26, 2025\",\n  \"content\": \"Full article text with paragraphs...\",\n  \"excerpt\": \"Brief excerpt...\",\n  \"read_time\": \"5 min\",\n  \"tags\": [\"tag1\", \"tag2\"],\n  \"category\": \"Category\",\n  \"url\": \"/article/...\",\n  \"image_url\": \"https://...\"\n}\n\nHTML:\n{html}\n\nSCREENSHOT: Provided as image input"
+    },
+
+    "jobs": {
+      "id": "jobs",
+      "name": "Jobs",
+      "icon": "💼",
+      "keywords": ["job", "career", "position", "hiring", "apply", "linkedin", "indeed", "salary"],
+      "schema": {
+        "title": "string",
+        "company": "string",
+        "location": "string",
+        "job_type": "string",
+        "salary": "string",
+        "posted_date": "string",
+        "description": "string",
+        "requirements": "array",
+        "benefits": "array",
+        "url": "string"
+      },
+      "extract_all_prompt": "You are a precise data extraction specialist. Extract ALL job listings from this HTML.\n\nINSTRUCTIONS:\n1. Find every job posting on the page\n2. Extract job title, company, and location\n3. Capture job type (Full-time, Part-time, Contract, Remote)\n4. Extract salary range if available\n5. Include posted date\n6. Extract brief description (first 2-3 sentences)\n7. Capture key requirements if listed\n8. Include application URLs\n9. Return ONLY valid JSON array, no explanations\n\nOUTPUT FORMAT:\n[\n  {\n    \"title\": \"Job Title\",\n    \"company\": \"Company Name\",\n    \"location\": \"City, State\",\n    \"job_type\": \"Full-time\",\n    \"salary\": \"$80k-$120k\",\n    \"posted_date\": \"2 days ago\",\n    \"description\": \"Brief description...\",\n    \"requirements\": [\"req1\", \"req2\"],\n    \"benefits\": [\"benefit1\"],\n    \"url\": \"/job/...\"\n  }\n]\n\nHTML:\n{html}",
+      
+      "extract_main_prompt": "You are a precise data extraction specialist. Extract the MAIN job posting from this page.\n\nINSTRUCTIONS:\n1. Identify the primary job posting\n2. Extract complete job description\n3. Use screenshot to identify main content\n4. Capture all requirements and qualifications\n5. Extract benefits and perks\n6. Include salary range if available\n7. Preserve application instructions\n8. Return ONLY valid JSON object, no explanations\n\nOUTPUT FORMAT:\n{\n  \"title\": \"Job Title\",\n  \"company\": \"Company Name\",\n  \"location\": \"City, State\",\n  \"job_type\": \"Full-time\",\n  \"salary\": \"$80k-$120k\",\n  \"posted_date\": \"2 days ago\",\n  \"description\": \"Full job description...\",\n  \"requirements\": [\"req1\", \"req2\"],\n  \"benefits\": [\"benefit1\", \"benefit2\"],\n  \"url\": \"/job/...\"\n}\n\nHTML:\n{html}\n\nSCREENSHOT: Provided as image input"
+    },
+
+    "posts": {
+      "id": "posts",
+      "name": "Social Posts",
+      "icon": "💬",
+      "keywords": ["post", "tweet", "linkedin", "facebook", "social", "feed", "comment", "share"],
+      "schema": {
+        "author": "string",
+        "author_title": "string",
+        "content": "string",
+        "posted_date": "string",
+        "likes": "string",
+        "comments": "string",
+        "shares": "string",
+        "url": "string",
+        "media_urls": "array"
+      },
+      "extract_all_prompt": "You are a precise data extraction specialist. Extract ALL social posts from this HTML.\n\nINSTRUCTIONS:\n1. Find every post in the feed\n2. Extract author name and title/position\n3. Capture complete post text\n4. Extract engagement metrics (likes, comments, shares)\n5. Include posted date/time\n6. Capture media URLs (images, videos)\n7. Include post URLs if available\n8. Preserve hashtags and mentions\n9. Return ONLY valid JSON array, no explanations\n\nOUTPUT FORMAT:\n[\n  {\n    \"author\": \"Author Name\",\n    \"author_title\": \"Job Title at Company\",\n    \"content\": \"Post text content...\",\n    \"posted_date\": \"2h ago\",\n    \"likes\": \"123\",\n    \"comments\": \"45\",\n    \"shares\": \"67\",\n    \"url\": \"/post/...\",\n    \"media_urls\": [\"https://...\"]\n  }\n]\n\nHTML:\n{html}",
+      
+      "extract_main_prompt": "You are a precise data extraction specialist. Extract the MAIN social post from this page.\n\nINSTRUCTIONS:\n1. Identify the primary post being displayed\n2. Extract complete post content\n3. Use screenshot to identify main post\n4. Capture author information\n5. Extract all engagement metrics\n6. Include all media URLs\n7. Preserve formatting (line breaks, hashtags)\n8. Return ONLY valid JSON object, no explanations\n\nOUTPUT FORMAT:\n{\n  \"author\": \"Author Name\",\n  \"author_title\": \"Job Title at Company\",\n  \"content\": \"Complete post text...\",\n  \"posted_date\": \"2h ago\",\n  \"likes\": \"123\",\n  \"comments\": \"45\",\n  \"shares\": \"67\",\n  \"url\": \"/post/...\",\n  \"media_urls\": [\"https://...\"]\n}\n\nHTML:\n{html}\n\nSCREENSHOT: Provided as image input"
+    }
+  },
+  "generic": {
+    "extract_all_prompt": "You are a precise data extraction specialist. Extract ALL structured items from this HTML.\n\nINSTRUCTIONS:\n1. Analyze the page structure to identify repeating items\n2. Detect the most appropriate schema automatically\n3. Extract all instances of the identified pattern\n4. Preserve original data formats\n5. Include all available metadata\n6. Return ONLY valid JSON array, no explanations\n7. If no clear pattern exists, extract key information as objects\n\nOUTPUT FORMAT:\n[\n  {\n    \"field1\": \"value1\",\n    \"field2\": \"value2\"\n  }\n]\n\nHTML:\n{html}",
+    
+    "extract_main_prompt": "You are a precise data extraction specialist. Extract the MAIN content from this page.\n\nINSTRUCTIONS:\n1. Identify the primary content on the page\n2. Use screenshot to determine visual hierarchy\n3. Extract title, main text, and key metadata\n4. Detect content type automatically\n5. Generate appropriate schema based on content\n6. Return ONLY valid JSON object, no explanations\n\nOUTPUT FORMAT:\n{\n  \"title\": \"Main title\",\n  \"content\": \"Main content...\",\n  \"metadata\": {\n    \"key\": \"value\"\n  }\n}\n\nHTML:\n{html}\n\nSCREENSHOT: Provided as image input"
+  },
+
+  "smart_features": {
+    "deduplication": {
+      "prompt": "You are a deduplication specialist. Analyze these extracted items and remove duplicates.\n\nINSTRUCTIONS:\n1. Compare all items for similarity\n2. Consider titles, descriptions, and key identifiers\n3. Items with >85% similarity are duplicates\n4. Keep the most complete version of each item\n5. Preserve item order (keep first occurrence)\n6. Return deduplicated array in same format\n7. Return ONLY valid JSON array, no explanations\n\nITEMS:\n{items}\n\nOUTPUT: Return deduplicated JSON array",
+      "enabled_by_default": false
+    },
+
+    "csv_formatting": {
+      "prompt": "You are a CSV formatting specialist. Convert this JSON data to properly formatted CSV.\n\nINSTRUCTIONS:\n1. Analyze JSON structure and extract all fields\n2. Create CSV header row with all field names\n3. Handle nested objects by flattening (use dot notation: parent.child)\n4. Handle arrays by joining with semicolons\n5. Escape commas, quotes, and newlines per RFC 4180\n6. Wrap fields containing commas/quotes in double quotes\n7. Escape internal quotes by doubling them\n8. Preserve empty fields as empty cells\n9. Return ONLY valid CSV text, no explanations\n\nMODE: {mode}\n- standard: Human-readable format\n- data_scientist: Optimized for analysis (normalized values)\n- custom: Use custom field mapping if provided\n\nJSON:\n{json}\n\nOUTPUT: Return RFC 4180 compliant CSV",
+      "modes": {
+        "standard": "Human-readable CSV with original formatting",
+        "data_scientist": "Analysis-ready CSV with normalized values",
+        "custom": "User-defined field mapping"
+      }
+    },
+
+    "comparisons": {
+      "prompt": "You are a comparison specialist. Analyze these items and provide head-to-head comparison.\n\nINSTRUCTIONS:\n1. Identify key attributes across all items\n2. Create comparison matrix highlighting differences\n3. Determine winner for each attribute (if applicable)\n4. Provide pros/cons for each item\n5. Calculate overall score based on completeness and quality\n6. Return structured comparison data\n7. Return ONLY valid JSON, no explanations\n\nITEMS:\n{items}\n\nOUTPUT FORMAT:\n{\n  \"comparison_matrix\": {\n    \"attribute\": [\"item1_value\", \"item2_value\"]\n  },\n  \"pros_cons\": [\n    {\n      \"item\": \"item1\",\n      \"pros\": [\"pro1\"],\n      \"cons\": [\"con1\"]\n    }\n  ],\n  \"recommendation\": \"Best choice based on analysis\"\n}",
+      "enabled_by_default": false
+    },
+
+    "recommendations": {
+      "prompt": "You are a recommendation specialist. Analyze these items and provide personalized recommendations.\n\nINSTRUCTIONS:\n1. Analyze all items for quality, relevance, and value\n2. Consider user context: {context}\n3. Rank items by suitability\n4. Provide reasoning for each recommendation\n5. Highlight standout features\n6. Flag potential concerns\n7. Return ONLY valid JSON, no explanations\n\nCONTEXT:\n{context}\n\nITEMS:\n{items}\n\nOUTPUT FORMAT:\n{\n  \"recommendations\": [\n    {\n      \"rank\": 1,\n      \"item\": \"item_title\",\n      \"score\": 95,\n      \"reasoning\": \"Why recommended\",\n      \"highlights\": [\"feature1\"],\n      \"concerns\": [\"concern1\"]\n    }\n  ]\n}",
+      "enabled_by_default": false
+    },
+
+    "trends": {
+      "prompt": "You are a market trend analyst. Identify patterns and trends in these items.\n\nINSTRUCTIONS:\n1. Analyze items for common patterns\n2. Identify pricing trends (if applicable)\n3. Detect feature patterns\n4. Highlight emerging themes\n5. Compare against typical market standards\n6. Provide actionable insights\n7. Return ONLY valid JSON, no explanations\n\nITEMS:\n{items}\n\nOUTPUT FORMAT:\n{\n  \"trends\": [\n    {\n      \"category\": \"pricing\",\n      \"observation\": \"Trend description\",\n      \"insight\": \"What it means\"\n    }\n  ],\n  \"summary\": \"Overall market analysis\"\n}",
+      "enabled_by_default": false
+    }
+  },
+
+  "quality_scoring": {
+    "prompt": "You are a data quality specialist. Analyze this extracted data and calculate quality score.\n\nINSTRUCTIONS:\n1. Evaluate completeness (% of fields populated)\n2. Assess consistency (formatting, structure)\n3. Check validity (reasonable values, proper types)\n4. Calculate confidence score (0-100)\n5. Provide specific quality metrics\n6. Identify missing or problematic fields\n7. Return ONLY valid JSON, no explanations\n\nEXTRACTED DATA:\n{data}\n\nOUTPUT FORMAT:\n{\n  \"overall_score\": 85,\n  \"metrics\": {\n    \"completeness\": 90,\n    \"consistency\": 85,\n    \"validity\": 80,\n    \"confidence\": 85\n  },\n  \"issues\": [\n    {\n      \"field\": \"field_name\",\n      \"issue\": \"description\",\n      \"severity\": \"low|medium|high\"\n    }\n  ],\n  \"summary\": \"Quality assessment summary\"\n}",
+    "thresholds": {
+      "excellent": 90,
+      "good": 80,
+      "fair": 60,
+      "poor": 0
+    },
+    "color_coding": {
+      "excellent": "#10b981",
+      "good": "#f59e0b",
+      "fair": "#f97316",
+      "poor": "#ef4444"
+    }
+  },
+
+  "custom_prompt_template": {
+    "user_defined": "You are a precise data extraction specialist.\n\nUSER INSTRUCTIONS:\n{user_instructions}\n\nHTML:\n{html}\n\nSCREENSHOT: {screenshot_status}\n\nIMPORTANT: Return ONLY valid JSON matching the requested structure. No explanations.",
+    "placeholder_fields": [
+      "{user_instructions}",
+      "{html}",
+      "{screenshot_status}"
+    ]
+  },
+
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2025-10-26",
+    "supported_providers": ["chrome_ai", "gemini_cloud"],
+    "prompt_optimization": "Prompts optimized for Gemini models with focus on JSON output reliability"
+  }
+}

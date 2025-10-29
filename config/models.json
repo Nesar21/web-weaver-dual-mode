@@ -1,0 +1,110 @@
+{
+  "providers": {
+    "chrome_ai": {
+      "id": "chrome_ai",
+      "name": "Chrome Built-in AI",
+      "type": "local",
+      "experimental": true,
+      "description": "Fast, private, zero-cost local AI processing",
+      "icon": "🔵",
+      "requires_api_key": false,
+      "models": {
+        "gemini_nano": {
+          "id": "gemini_nano",
+          "name": "Gemini Nano",
+          "display_name": "Chrome AI (Gemini Nano)",
+          "context_window": 8192,
+          "max_output_tokens": 2048,
+          "supports_vision": false,
+          "capabilities": ["extraction", "summarization", "translation", "language_detection"],
+          "availability_check": "window.ai?.languageModel?.capabilities"
+        }
+      },
+      "apis": {
+        "prompt": {
+          "available": "window.ai?.languageModel",
+          "method": "createTextSession",
+          "timeout": 30000
+        },
+        "summarizer": {
+          "available": "window.ai?.summarizer",
+          "method": "create",
+          "timeout": 20000
+        },
+        "translator": {
+          "available": "window.ai?.translator",
+          "method": "create",
+          "timeout": 20000
+        },
+        "language_detector": {
+          "available": "window.ai?.languageDetector",
+          "method": "create",
+          "timeout": 10000
+        }
+      }
+    },
+    "gemini_cloud": {
+      "id": "gemini_cloud",
+      "name": "Gemini Cloud API",
+      "type": "cloud",
+      "experimental": false,
+      "description": "Advanced AI with vision support and larger context",
+      "icon": "☁️",
+      "requires_api_key": true,
+      "models": {
+        "flash_lite": {
+          "id": "gemini-2.0-flash-lite",
+          "name": "gemini-2.0-flash-lite",
+          "display_name": "FAST (Flash Lite)",
+          "tier": "MIN",
+          "context_window": 1000000,
+          "max_output_tokens": 8192,
+          "supports_vision": true,
+          "rpm_limit": 30,
+          "rpd_limit": 200,
+          "capabilities": ["extraction", "deduplication", "csv_formatting", "comparisons", "recommendations"]
+        },
+        "flash_exp": {
+          "id": "gemini-2.0-flash-exp",
+          "name": "gemini-2.0-flash-exp",
+          "display_name": "BALANCED (Flash Experimental)",
+          "tier": "BALANCED",
+          "context_window": 1000000,
+          "max_output_tokens": 8192,
+          "supports_vision": true,
+          "rpm_limit": 10,
+          "rpd_limit": 50,
+          "capabilities": ["extraction", "deduplication", "csv_formatting", "comparisons", "recommendations", "trends"]
+        },
+        "pro": {
+          "id": "gemini-1.5-pro",
+          "name": "gemini-1.5-pro",
+          "display_name": "ADVANCED (Pro 1.5)",
+          "tier": "MAX",
+          "context_window": 2000000,
+          "max_output_tokens": 8192,
+          "supports_vision": true,
+          "rpm_limit": 2,
+          "rpd_limit": 50,
+          "capabilities": ["extraction", "deduplication", "csv_formatting", "comparisons", "recommendations", "trends", "custom_prompts"]
+        }
+      }
+    }
+  },
+  "default_provider": "chrome_ai",
+  "default_model": {
+    "chrome_ai": "gemini_nano",
+    "gemini_cloud": "flash_lite"
+  },
+  "model_selection_strategy": {
+    "auto": {
+      "prefer_local": true,
+      "fallback_to_cloud": false,
+      "description": "Prefer Chrome AI, no automatic fallback"
+    },
+    "manual": {
+      "user_controlled": true,
+      "description": "User explicitly selects provider and model"
+    }
+  }
+}

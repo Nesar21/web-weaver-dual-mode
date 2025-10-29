@@ -1,0 +1,19 @@
+{
+  "ai_provider": {
+    "selected_provider": "chrome_ai",
+    "selected_model": {
+      "chrome_ai": "gemini_nano",
+      "gemini_cloud": "gemini-2.0-flash-lite"
+    }
+  },
+  "extraction": {
+    "mode": "extract_all",
+    "content_type": "auto",
+    "timeout_seconds": 60
+  },
+  "advanced": {
+    "log_level": "info",
+    "debug_mode": false,
+    "audio_feedback": false
+  }
+}

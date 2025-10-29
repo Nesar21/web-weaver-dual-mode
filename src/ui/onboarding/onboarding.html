@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome - Web Weaver Lightning</title>
+  <link rel="stylesheet" href="onboarding.css">
+</head>
+<body data-theme="auto">
+  
+  <div class="onboarding-container">
+    
+    <!-- Progress Indicator -->
+    <div class="progress-indicator">
+      <div class="progress-step active" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-label">Welcome</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-label">AI Provider</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-label">Setup</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="4">
+        <div class="step-number">4</div>
+        <div class="step-label">Done</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Welcome -->
+    <div class="step-content active" data-step="1">
+      <div class="step-header">
+        <img src="../../assets/icons/icon128.png" alt="Web Weaver" class="logo">
+        <h1>Welcome to Web Weaver Lightning</h1>
+        <p class="subtitle">Intelligent web data extraction powered by AI</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Lightning Fast</h3>
+          <p>Extract structured data from any webpage in seconds</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>AI-Powered</h3>
+          <p>Uses advanced AI to understand page content and structure</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Smart Extraction</h3>
+          <p>Automatically detects products, articles, jobs, and more</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Export Anywhere</h3>
+          <p>Download as JSON or CSV for spreadsheets and databases</p>
+        </div>
+      </div>
+      
+      <div class="step-actions">
+        <button class="btn btn-primary btn-large" data-action="next">
+          Get Started
+          <svg class="btn-icon-right" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M5 12h14m-7-7l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: AI Provider -->
+    <div class="step-content" data-step="2">
+      <div class="step-header">
+        <h1>Choose Your AI Provider</h1>
+        <p class="subtitle">Select how Web Weaver will process your data</p>
+      </div>
+      
+      <div class="provider-options">
+        <label class="provider-card">
+          <input type="radio" name="onboarding-provider" value="chrome_ai" checked>
+          <div class="provider-card-content">
+            <div class="provider-header">
+              <h3>Chrome Built-in AI</h3>
+              <span class="badge badge-recommended">Recommended</span>
+            </div>
+            <p class="provider-description">
+              Free, fast, and private. Runs locally on your device using Chrome's Gemini Nano model.
+            </p>
+            <div class="provider-features">
+              <div class="feature-item">
+                <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>100% Free</span>
+              </div>
+              <div class="feature-item">
+                <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>No API key needed</span>
+              </div>
+              <div class="feature-item">
+                <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Privacy-focused</span>
+              </div>
+              <div class="feature-item">
+                <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Works offline</span>
+              </div>
+            </div>
+            <div id="chrome-ai-status" class="provider-status">
+              <span class="status-text">Checking availability...</span>
+            </div>
+          </div>
+        </label>
+        
+        <label class="provider-card">
+          <input type="radio" name="onboarding-provider" value="gemini_cloud">
+          <div class="provider-card-content">
+            <div class="provider-header">
+              <h3>Gemini Cloud API</h3>
+              <span class="badge badge-advanced">Advanced</span>
+            </div>
+            <p class="provider-description">
+              More powerful with advanced features. Requires a free Google AI Studio API key.
+            </p>
+            <div class="provider-features">
+              <div class="feature-item">
+                <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>More accurate</span>
+              </div>
+              <div class="feature-item">
+                <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Multiple models</span>
+              </div>
+              <div class="feature-item">
+                <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Smart features</span>
+              </div>
+              <div class="feature-item">
+                <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Vision support</span>
+              </div>
+            </div>
+          </div>
+        </label>
+      </div>
+      
+      <div class="step-actions">
+        <button class="btn btn-secondary" data-action="prev">
+          <svg class="btn-icon-left" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 12H5m7 7l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back
+        </button>
+        <button class="btn btn-primary" data-action="next">
+          Continue
+          <svg class="btn-icon-right" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M5 12h14m-7-7l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Setup (API Key for Gemini Cloud) -->
+    <div class="step-content" data-step="3">
+      <div class="step-header">
+        <h1>Setup Your Provider</h1>
+        <p class="subtitle" id="setup-subtitle">Complete the setup to start extracting data</p>
+      </div>
+      
+      <!-- Chrome AI Setup -->
+      <div id="chrome-ai-setup" class="setup-section">
+        <div class="info-box">
+          <svg class="info-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10" stroke-width="2"/>
+            <path d="M12 16v-4m0-4h.01" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <h3>Chrome Built-in AI is ready!</h3>
+            <p>No additional setup required. You're all set to start extracting data.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gemini Cloud Setup -->
+      <div id="gemini-cloud-setup" class="setup-section hidden">
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <div class="input-group">
+            <input 
+              type="password" 
+              id="onboarding-api-key" 
+              class="form-input masked" 
+              placeholder="AIza...your-api-key"
+              autocomplete="off"
+            >
+            <button id="onboarding-toggle-visibility" class="input-addon-btn" title="Toggle visibility">
+              <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+          <p class="form-help">
+            Don't have an API key? 
+            <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">Get one free from Google AI Studio</a>
+          </p>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="onboarding-remember-key" checked>
+            <span>Remember API key securely on this device</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="step-actions">
+        <button class="btn btn-secondary" data-action="prev">
+          <svg class="btn-icon-left" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 12H5m7 7l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back
+        </button>
+        <button class="btn btn-primary" data-action="next">
+          Continue
+          <svg class="btn-icon-right" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M5 12h14m-7-7l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 4: Complete -->
+    <div class="step-content" data-step="4">
+      <div class="step-header">
+        <div class="success-icon">✓</div>
+        <h1>You're All Set!</h1>
+        <p class="subtitle">Web Weaver is ready to extract data</p>
+      </div>
+      
+      <div class="tips-section">
+        <h3>Quick Tips:</h3>
+        <ul class="tips-list">
+          <li>Click the Web Weaver icon in your toolbar to start</li>
+          <li>Works on most websites - products, articles, jobs, and more</li>
+          <li>Export data as JSON or CSV for spreadsheets</li>
+          <li>Access settings anytime to customize your experience</li>
+        </ul>
+      </div>
+      
+      <div class="step-actions">
+        <button class="btn btn-primary btn-large" data-action="finish">
+          Start Extracting
+          <svg class="btn-icon-right" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M5 12h14m-7-7l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="onboarding.js" type="module"></script>
+</body>
+</html>

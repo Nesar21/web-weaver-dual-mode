@@ -1,0 +1,99 @@
+{
+  "providers": {
+    "chrome_ai": {
+      "has_limits": false,
+      "description": "No rate limits for local processing",
+      "throttling": {
+        "enabled": false
+      }
+    },
+    "gemini_cloud": {
+      "has_limits": true,
+      "description": "Google AI rate limits per model",
+      "models": {
+        "gemini-2.0-flash-lite": {
+          "rpm": {
+            "limit": 30,
+            "window_seconds": 60,
+            "unit": "requests per minute",
+            "warning_threshold": 25,
+            "error_threshold": 30
+          },
+          "rpd": {
+            "limit": 200,
+            "window_seconds": 86400,
+            "unit": "requests per day",
+            "reset_time": "00:00:00 UTC",
+            "warning_threshold": 180,
+            "error_threshold": 200
+          }
+        },
+        "gemini-2.0-flash-exp": {
+          "rpm": {
+            "limit": 10,
+            "window_seconds": 60,
+            "unit": "requests per minute",
+            "warning_threshold": 8,
+            "error_threshold": 10
+          },
+          "rpd": {
+            "limit": 50,
+            "window_seconds": 86400,
+            "unit": "requests per day",
+            "reset_time": "00:00:00 UTC",
+            "warning_threshold": 45,
+            "error_threshold": 50
+          }
+        },
+        "gemini-1.5-pro": {
+          "rpm": {
+            "limit": 2,
+            "window_seconds": 60,
+            "unit": "requests per minute",
+            "warning_threshold": 1,
+            "error_threshold": 2
+          },
+          "rpd": {
+            "limit": 50,
+            "window_seconds": 86400,
+            "unit": "requests per day",
+            "reset_time": "00:00:00 UTC",
+            "warning_threshold": 45,
+            "error_threshold": 50
+          }
+        }
+      },
+      "throttling": {
+        "enabled": true,
+        "strategy": "wait_and_retry",
+        "max_retries": 3,
+        "retry_delay_ms": 1000,
+        "exponential_backoff": true,
+        "backoff_multiplier": 2
+      },
+      "ui_behavior": {
+        "show_countdown": true,
+        "show_progress_bars": true,
+        "auto_switch_model_prompt": true,
+        "warning_messages": {
+          "approaching_rpm": "Approaching rate limit. {remaining} requests left this minute.",
+          "approaching_rpd": "Approaching daily limit. {remaining} requests left today.",
+          "rpm_exceeded": "Rate limit reached. Next extraction available in {seconds}s.",
+          "rpd_exceeded": "Daily quota exhausted. Resets at midnight UTC ({hours}h {minutes}m).",
+          "suggest_downgrade": "Consider switching to FAST model for more requests."
+        }
+      }
+    }
+  },
+  "storage_keys": {
+    "rpm_counter": "rate_limit_rpm_{model}",
+    "rpd_counter": "rate_limit_rpd_{model}",
+    "last_request_time": "rate_limit_last_request_{model}",
+    "daily_reset_time": "rate_limit_daily_reset"
+  },
+  "tracking": {
+    "precision": "second",
+    "cleanup_old_data": true,
+    "cleanup_interval_hours": 24
+  }
+}

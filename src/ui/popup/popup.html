@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Weaver Lightning</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body data-theme="auto">
+  
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <img src="../../assets/icons/icon48.png" alt="Web Weaver" class="logo-icon">
+        <h1 class="logo-text">Web Weaver</h1>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" class="icon-btn" title="Toggle theme">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button id="settings-btn" class="icon-btn" title="Settings">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="3" stroke-width="2"/>
+            <path d="M12 1v6m0 6v6M1 12h6m6 0h6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    
+    <!-- AI Provider Selection -->
+    <section class="section provider-section">
+      <div class="section-header">
+        <h2 class="section-title">AI Provider</h2>
+        <span id="provider-status" class="status-badge status-unknown">Unknown</span>
+      </div>
+      
+      <div class="provider-selector">
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="provider" value="chrome_ai" id="provider-chrome-ai">
+            <span class="radio-text">
+              <span class="radio-title">Chrome Built-in AI</span>
+              <span class="radio-subtitle">Free, local processing</span>
+            </span>
+          </label>
+          
+          <label class="radio-label">
+            <input type="radio" name="provider" value="gemini_cloud" id="provider-gemini-cloud">
+            <span class="radio-text">
+              <span class="radio-title">Gemini Cloud API</span>
+              <span class="radio-subtitle">Powerful, requires API key</span>
+            </span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Model Selection (for Gemini Cloud) -->
+      <div id="model-selector" class="model-selector hidden">
+        <label class="form-label">Model</label>
+        <select id="model-select" class="form-select">
+          <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite (Fast)</option>
+          <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash Experimental</option>
+          <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</option>
+        </select>
+      </div>
+      
+      <!-- API Key Warning -->
+      <div id="api-key-warning" class="alert alert-warning hidden">
+        <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 9v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>API key required. <a href="#" id="add-api-key-link">Add in settings</a></span>
+      </div>
+    </section>
+
+    <!-- Extraction Mode -->
+    <section class="section extraction-section">
+      <div class="section-header">
+        <h2 class="section-title">Extraction Mode</h2>
+      </div>
+      
+      <div class="mode-selector">
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="mode" value="extract_all" id="mode-extract-all" checked>
+            <span class="radio-text">
+              <span class="radio-title">Extract All Items</span>
+              <span class="radio-subtitle">Extract all structured data</span>
+            </span>
+          </label>
+          
+          <label class="radio-label">
+            <input type="radio" name="mode" value="extract_main" id="mode-extract-main">
+            <span class="radio-text">
+              <span class="radio-title">Extract Main Article</span>
+              <span class="radio-subtitle">Focus on primary content</span>
+            </span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Type -->
+    <section class="section content-section">
+      <div class="section-header">
+        <h2 class="section-title">Content Type</h2>
+      </div>
+      
+      <select id="content-type-select" class="form-select">
+        <option value="auto">Auto-detect</option>
+        <option value="products">Products</option>
+        <option value="articles">Articles</option>
+        <option value="jobs">Job Listings</option>
+        <option value="posts">Social Posts</option>
+        <option value="generic">Generic Data</option>
+      </select>
+    </section>
+
+    <!-- Extract Button -->
+    <section class="section action-section">
+      <button id="extract-btn" class="btn btn-primary btn-large">
+        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m14-7l-5-5-5 5m5-5v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Extract Data
+      </button>
+    </section>
+    <!-- Rate Limit Display -->
+    <section id="rate-limit-section" class="section rate-limit-section hidden">
+      <div class="section-header">
+        <h2 class="section-title">Rate Limits</h2>
+      </div>
+      
+      <div class="rate-limit-display">
+        <div class="rate-limit-item">
+          <div class="rate-limit-label">Requests per Minute</div>
+          <div class="rate-limit-bar">
+            <div id="rpm-progress" class="rate-limit-progress" style="width: 0%"></div>
+          </div>
+          <div id="rpm-text" class="rate-limit-text">0/30 RPM</div>
+        </div>
+        
+        <div class="rate-limit-item">
+          <div class="rate-limit-label">Requests per Day</div>
+          <div class="rate-limit-bar">
+            <div id="rpd-progress" class="rate-limit-progress" style="width: 0%"></div>
+          </div>
+          <div id="rpd-text" class="rate-limit-text">0/200 RPD</div>
+        </div>
+      </div>
+      
+      <!-- Countdown Timer -->
+      <div id="countdown-timer" class="countdown-timer hidden">
+        <svg class="countdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" stroke-width="2"/>
+          <path d="M12 6v6l4 2" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span id="countdown-text">Next extraction in 00:45</span>
+      </div>
+    </section>
+
+    <!-- Extraction Progress -->
+    <section id="progress-section" class="section progress-section hidden">
+      <div class="progress-container">
+        <div class="spinner"></div>
+        <p id="progress-text" class="progress-text">Extracting data...</p>
+      </div>
+    </section>
+
+    <!-- Results Display -->
+    <section id="results-section" class="section results-section hidden">
+      <div class="section-header">
+        <h2 class="section-title">Extraction Results</h2>
+        <div class="section-actions">
+          <button id="close-results-btn" class="icon-btn" title="Close results">
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M18 6L6 18M6 6l12 12" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Results Summary -->
+      <div class="results-summary">
+        <div class="summary-item">
+          <span class="summary-label">Items:</span>
+          <span id="item-count" class="summary-value">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Duration:</span>
+          <span id="duration" class="summary-value">0s</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Quality:</span>
+          <span id="quality-score" class="summary-value quality-badge">-</span>
+        </div>
+      </div>
+      
+      <!-- Results Preview -->
+      <div class="results-preview">
+        <pre id="results-json" class="results-json"></pre>
+      </div>
+      
+      <!-- Export Options -->
+      <div class="export-options">
+        <button id="export-json-btn" class="btn btn-secondary btn-small">
+          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Export JSON
+        </button>
+        
+        <button id="export-csv-btn" class="btn btn-secondary btn-small">
+          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Export CSV
+        </button>
+        
+        <button id="copy-json-btn" class="btn btn-secondary btn-small">
+          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
+          </svg>
+          Copy
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notifications Container -->
+  <div id="notifications-container" class="notifications-container"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#" id="history-link" class="footer-link">History</a>
+      <span class="footer-separator">•</span>
+      <a href="#" id="help-link" class="footer-link">Help</a>
+      <span class="footer-separator">•</span>
+      <a href="#" id="feedback-link" class="footer-link">Feedback</a>
+    </div>
+    <div class="footer-version">v1.0.0</div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

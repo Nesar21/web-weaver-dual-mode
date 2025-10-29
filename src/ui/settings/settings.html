@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Web Weaver Lightning</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body data-theme="auto">
+  
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="header-left">
+          <button id="back-btn" class="btn-back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M19 12H5M12 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back
+          </button>
+          <h1 class="header-title">Settings</h1>
+        </div>
+        <div class="header-actions">
+          <button id="theme-toggle" class="icon-btn" title="Toggle theme">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="container">
+      
+      <!-- API Key Section -->
+      <section class="settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Gemini API Key</h2>
+          <span class="section-badge">Required for Gemini Cloud</span>
+        </div>
+        
+        <div class="section-content">
+          <p class="section-description">
+            Enter your Google AI Studio API key to use Gemini Cloud models. 
+            <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">Get a free API key</a>
+          </p>
+          
+          <div class="form-group">
+            <label class="form-label">API Key</label>
+            <div class="input-group">
+              <input 
+                type="password" 
+                id="api-key-input" 
+                class="form-input masked" 
+                placeholder="AIza...your-api-key"
+                autocomplete="off"
+              >
+              <button id="toggle-visibility-btn" class="input-addon-btn" title="Toggle visibility">
+                <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="2"/>
+                  <circle cx="12" cy="12" r="3" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p class="form-help">Your API key is encrypted and stored locally on your device.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember-api-key" checked>
+              <span>Remember API key across sessions</span>
+            </label>
+          </div>
+          
+          <div id="api-key-status" class="alert alert-info hidden">
+            <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke-width="2"/>
+              <path d="M12 16v-4m0-4h.01" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span id="api-key-status-text">API key saved successfully</span>
+          </div>
+          
+          <div class="button-group">
+            <button id="save-api-key-btn" class="btn btn-primary">Save API Key</button>
+            <button id="validate-api-key-btn" class="btn btn-secondary">Test Connection</button>
+            <button id="clear-api-key-btn" class="btn btn-secondary btn-danger">Clear API Key</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI Provider Section -->
+      <section class="settings-section">
+        <div class="section-header">
+          <h2 class="section-title">AI Provider</h2>
+        </div>
+        
+        <div class="section-content">
+          <div class="radio-group">
+            <label class="radio-card">
+              <input type="radio" name="provider" value="chrome_ai" id="provider-chrome-ai">
+              <div class="radio-card-content">
+                <div class="radio-card-header">
+                  <span class="radio-card-title">Chrome Built-in AI</span>
+                  <span id="chrome-ai-status" class="status-badge status-unknown">Checking...</span>
+                </div>
+                <p class="radio-card-description">
+                  Free local AI processing using Chrome's Gemini Nano. No API key required.
+                </p>
+                <div class="radio-card-features">
+                  <span class="feature-tag">Free</span>
+                  <span class="feature-tag">Private</span>
+                  <span class="feature-tag">Local</span>
+                </div>
+              </div>
+            </label>
+            
+            <label class="radio-card">
+              <input type="radio" name="provider" value="gemini_cloud" id="provider-gemini-cloud">
+              <div class="radio-card-content">
+                <div class="radio-card-header">
+                  <span class="radio-card-title">Gemini Cloud API</span>
+                  <span id="gemini-cloud-status" class="status-badge status-available">Available</span>
+                </div>
+                <p class="radio-card-description">
+                  Powerful cloud-based AI with multiple model options. Requires API key.
+                </p>
+                <div class="radio-card-features">
+                  <span class="feature-tag">Advanced</span>
+                  <span class="feature-tag">Fast</span>
+                  <span class="feature-tag">Multimodal</span>
+                </div>
+              </div>
+            </label>
+          </div>
+          
+          <!-- Model Selection for Gemini Cloud -->
+          <div id="model-selection" class="model-selection hidden">
+            <label class="form-label">Selected Model</label>
+            <select id="model-select" class="form-select">
+              <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite (Fast, 30 RPM)</option>
+              <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash Experimental (10 RPM)</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced, 2 RPM)</option>
+            </select>
+            <p class="form-help">RPM = Requests Per Minute. Higher limits for faster models.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Extraction Settings Section -->
+      <section class="settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Extraction Settings</h2>
+        </div>
+        
+        <div class="section-content">
+          <div class="form-group">
+            <label class="form-label">Default Extraction Mode</label>
+            <select id="extraction-mode-select" class="form-select">
+              <option value="extract_all">Extract All Items</option>
+              <option value="extract_main">Extract Main Article</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Default Content Type</label>
+            <select id="content-type-select" class="form-select">
+              <option value="auto">Auto-detect</option>
+              <option value="products">Products</option>
+              <option value="articles">Articles</option>
+              <option value="jobs">Job Listings</option>
+              <option value="posts">Social Posts</option>
+              <option value="generic">Generic Data</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Extraction Timeout (seconds)</label>
+            <input 
+              type="number" 
+              id="timeout-input" 
+              class="form-input" 
+              min="10" 
+              max="120" 
+              value="60"
+            >
+            <p class="form-help">Maximum time to wait for extraction to complete.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="screenshot-enabled">
+              <span>Enable screenshot capture (Extract Main mode only)</span>
+            </label>
+            <p class="form-help checkbox-help">Improves accuracy for visual content using multimodal AI.</p>
+          </div>
+        </div>
+      </section>
+      <!-- Smart Features Section -->
+      <section class="settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Smart Features</h2>
+          <span class="section-badge">Gemini Cloud Only</span>
+        </div>
+        
+        <div class="section-content">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="quality-score-enabled">
+              <span>Quality Score Analysis</span>
+            </label>
+            <p class="form-help checkbox-help">Automatically assess extraction quality and completeness.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="deduplication-enabled">
+              <span>AI-Powered Deduplication</span>
+            </label>
+            <p class="form-help checkbox-help">Remove duplicate items intelligently using AI.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="comparisons-enabled">
+              <span>Generate Comparisons</span>
+            </label>
+            <p class="form-help checkbox-help">Create side-by-side comparisons for extracted items.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="recommendations-enabled">
+              <span>AI Recommendations</span>
+            </label>
+            <p class="form-help checkbox-help">Get personalized recommendations based on extracted data.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="trends-enabled">
+              <span>Trend Detection</span>
+            </label>
+            <p class="form-help checkbox-help">Identify patterns and trends in large datasets (10+ items).</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- HTML Preprocessing Section -->
+      <section class="settings-section">
+        <div class="section-header">
+          <h2 class="section-title">HTML Preprocessing</h2>
+        </div>
+        
+        <div class="section-content">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remove-scripts" checked>
+              <span>Remove scripts</span>
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remove-styles" checked>
+              <span>Remove styles</span>
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remove-comments" checked>
+              <span>Remove comments</span>
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remove-navigation" checked>
+              <span>Remove navigation elements</span>
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remove-footer" checked>
+              <span>Remove footer elements</span>
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Max HTML Size (KB)</label>
+            <input 
+              type="number" 
+              id="max-html-size" 
+              class="form-input" 
+              min="100" 
+              max="1000" 
+              value="500"
+            >
+            <p class="form-help">HTML larger than this will be truncated to improve performance.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Advanced Settings Section -->
+      <section class="settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Advanced</h2>
+        </div>
+        
+        <div class="section-content">
+          <div class="form-group">
+            <label class="form-label">Log Level</label>
+            <select id="log-level-select" class="form-select">
+              <option value="error">Error</option>
+              <option value="warn">Warning</option>
+              <option value="info" selected>Info</option>
+              <option value="debug">Debug</option>
+            </select>
+            <p class="form-help">Controls verbosity of console logs. Use Debug for troubleshooting.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="debug-mode">
+              <span>Enable debug mode</span>
+            </label>
+            <p class="form-help checkbox-help">Shows detailed technical information in console.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="audio-feedback">
+              <span>Enable audio feedback</span>
+            </label>
+            <p class="form-help checkbox-help">Play sound effects for extraction events.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Theme</label>
+            <select id="theme-select" class="form-select">
+              <option value="auto">Auto (System)</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Data Management Section -->
+      <section class="settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Data Management</h2>
+        </div>
+        
+        <div class="section-content">
+          <div class="form-group">
+            <button id="export-settings-btn" class="btn btn-secondary">
+              <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Export Settings
+            </button>
+            <p class="form-help">Download your settings as a JSON file.</p>
+          </div>
+          
+          <div class="form-group">
+            <button id="import-settings-btn" class="btn btn-secondary">
+              <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m14-7l-5-5-5 5m5-5v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Import Settings
+            </button>
+            <input type="file" id="import-settings-input" accept=".json" hidden>
+            <p class="form-help">Restore settings from a previously exported file.</p>
+          </div>
+          
+          <div class="form-group">
+            <button id="reset-settings-btn" class="btn btn-secondary btn-danger">
+              <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3 21v-5h5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Reset to Defaults
+            </button>
+            <p class="form-help">Restore all settings to factory defaults.</p>
+          </div>
+          
+          <div class="form-group">
+            <button id="clear-all-data-btn" class="btn btn-secondary btn-danger">
+              <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Clear All Data
+            </button>
+            <p class="form-help">Delete all stored data including API keys, settings, and history.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Save Button -->
+      <div class="save-section">
+        <button id="save-settings-btn" class="btn btn-primary btn-large">
+          <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke-width="2"/>
+            <path d="M17 21v-8H7v8M7 3v5h8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Save All Settings
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Notifications Container -->
+  <div id="notifications-container" class="notifications-container"></div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmation-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <h3 id="modal-title" class="modal-title">Confirm Action</h3>
+      <p id="modal-message" class="modal-message">Are you sure?</p>
+      <div class="modal-actions">
+        <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+        <button id="modal-confirm-btn" class="btn btn-primary btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="settings.js" type="module"></script>
+</body>
+</html>

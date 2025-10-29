@@ -1,0 +1,36 @@
+{
+  "name": "web-weaver-lightning",
+  "version": "1.0.0",
+  "description": "Intelligent web data extraction powered by AI",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests yet\" && exit 0",
+    "lint": "echo \"No linter configured\" && exit 0",
+    "build": "echo \"No build process\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/web-weaver.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/web-weaver/issues"
+  },
+  "homepage": "https://github.com/yourusername/web-weaver#readme",
+  "keywords": [
+    "chrome-extension",
+    "web-scraping",
+    "data-extraction",
+    "ai",
+    "gemini",
+    "chrome-ai",
+    "automation",
+    "web-scraper"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
