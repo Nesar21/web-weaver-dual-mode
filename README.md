@@ -44,29 +44,12 @@ Web Weaver Dual Mode is a Chrome extension for extracting, structuring, and gene
 
 ---
 
-## How to Add Images in README
-
-1. Place `.png` files in `/src/assets/images/`
-2. Reference them using:
-
-Commit and push to GitHub.
-
----
-
-## Judge-Grade Engineering Principles
-
-No shortcuts — each function tested, each module isolated.
-No compromise — privacy and security enforced.
-No liability — open-source safe.
-If it isn't scalable, high-performance, and future-proof — it's excluded.
-
----
-
 **Name:** Nesara Amingad  
 
 **Email:** [nesaramingad821@gmail.com](mailto:nesaramingad821@gmail.com)  
 
 **LinkedIn:** [linkedin.com/in/nesar-amingad](https://www.linkedin.com/in/nesar-amingad/)
+
 ---
 
 ## Web Weaver — AI-Powered Web Data Extraction
