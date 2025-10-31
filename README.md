@@ -158,9 +158,11 @@ Load into Chrome:
 - (Optional) Google AI Studio API Key
 
 ### Setup
+```bash
 git clone https://github.com/amitkumardemo/web_weaver.git
 cd web_weaver
 npm install
+```
 
 Load via Developer Mode → Load Unpacked
 
