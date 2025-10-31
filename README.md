@@ -60,8 +60,10 @@ Web Weaver is a production-grade Chrome extension for extracting structured data
 
 ## Quick Start
 
+```bash
 git clone https://github.com/Nesar21/web-weaver-dual-mode
 cd web_weaver
+```
 
 Load into Chrome:
 - Navigate to chrome://extensions/
