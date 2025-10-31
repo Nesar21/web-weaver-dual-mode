@@ -1,8 +1,3 @@
-# Web Weaver Dual Mode
-
-[![Web Weaver demo](src/assets/images/Screenshot%202025-10-31%20at%2020.41.32.png)](src/assets/images/Screenshot%202025-10-31%20at%2020.41.32.png)
-[![Settings panel](src/assets/images/Screenshot%202025-10-31%20at%2020.41.38.png)](src/assets/images/Screenshot%202025-10-31%20at%2020.41.38.png)
-
 [GitHub Repository](https://github.com/Nesar21/web-weaver-dual-mode)  
 Maintainer: Nesara Amingad [nesaramingad821@gmail.com](mailto:nesaramingad821@gmail.com)
 
