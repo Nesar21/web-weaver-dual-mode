@@ -1,8 +1,3 @@
-[GitHub Repository](https://github.com/Nesar21/web-weaver-dual-mode)  
-Maintainer: Nesara Amingad [nesaramingad821@gmail.com](mailto:nesaramingad821@gmail.com)
-
----
-
 ## Overview
 
 Web Weaver Dual Mode is a Chrome extension for extracting, structuring, and generating web data using AI. It provides dual-mode operation: Chrome's local Gemini AI or Gemini Cloud API. No licenses. No bloat. Maximum performance.
@@ -33,10 +28,10 @@ Web Weaver Dual Mode is a Chrome extension for extracting, structuring, and gene
 ## UI Demo
 
 ### Action Popup
-![Web Weaver demo](src/assets/images/Screenshot%202025-10-31%20at%2020.41.32.png)
+![Settings panel](src/assets/images/Screenshot%202025-10-31%20at%2020.41.38.png)
 
 ### Settings Panel
-![Settings panel](src/assets/images/Screenshot%202025-10-31%20at%2020.41.38.png)
+![Web Weaver demo](src/assets/images/Screenshot%202025-10-31%20at%2020.41.32.png)
 
 ---
 
@@ -67,12 +62,11 @@ If it isn't scalable, high-performance, and future-proof — it's excluded.
 
 ---
 
-## Contact
+**Name:** Nesara Amingad  
 
-Nesara Amingad
-Email: [nesaramingad821@gmail.com](mailto:nesaramingad821@gmail.com)
-GitHub: [https://github.com/Nesar21/web-weaver-dual-mode](https://github.com/Nesar21/web-weaver-dual-mode)
+**Email:** [nesaramingad821@gmail.com](mailto:nesaramingad821@gmail.com)  
 
+**LinkedIn:** [linkedin.com/in/nesar-amingad](https://www.linkedin.com/in/nesar-amingad/)
 ---
 
 ## Web Weaver — AI-Powered Web Data Extraction
