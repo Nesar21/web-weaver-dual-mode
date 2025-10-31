@@ -1,6 +1,6 @@
 ## Overview
 
-Web Weaver Dual Mode is a Chrome extension for extracting, structuring, and generating web data using AI. It provides dual-mode operation: Chrome's local Gemini AI or Gemini Cloud API. No licenses. No bloat. Maximum performance.
+Web Weaver Dual Mode is a Chrome extension for extracting, structuring, and generating web data using AI. It provides dual-mode operation: Chrome's local Gemini AI or Gemini Cloud API. No licenses. Maximum performance.
 
 - Scalability: Batch processing and large-scale data extraction.
 - Performance: Local speed or cloud-level power.
@@ -60,7 +60,7 @@ Web Weaver is a production-grade Chrome extension for extracting structured data
 
 ## Quick Start
 
-git clone https://github.com/amitkumardemo/web_weaver.git
+git clone https://github.com/Nesar21/web-weaver-dual-mode
 cd web_weaver
 
 Load into Chrome:
@@ -98,8 +98,6 @@ Load into Chrome:
 | Caching | Scroll cache with deduplication |
 | Error Recovery | 7-level exponential backoff |
 | Security | AES encryption with no session persistence |
-| Translation | Built-in Chrome or Gemini translation APIs |
-| History | Full audit log of extractions |
 
 ---
 
@@ -112,7 +110,6 @@ Load into Chrome:
 
 ### Provider Selection
 - Chrome vs Cloud toggle
-- Automatic fallback
 - Real-time status indicators
 
 ### Extraction Modes
@@ -139,12 +136,10 @@ Load into Chrome:
 **AI Providers:**
 - Chrome AI API (Gemini Nano)
 - Google Generative AI SDK (Cloud)
-- Fallback: Chrome → Cloud → Offline
 
 **Storage:**
 - Chrome Storage API (sync-enabled)
 - Encrypted LocalStorage
-- IndexedDB for history
 
 **Pipeline:**
 - DOM parsing
@@ -172,7 +167,7 @@ Load via Developer Mode → Load Unpacked
 ## Feature Walkthrough
 
 - Quick Extract: Right-click → "Extract with Web Weaver"
-- Batch Process: 1000+ items per run
+- Batch Process: 10+ items per run
 - Smart Caching: Persistent session memory
 - Multi-Language: Auto-translate via Chrome or Gemini
 - Custom Extraction: Adjustable prompt and confidence
