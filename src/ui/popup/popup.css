@@ -1267,6 +1267,48 @@ a:hover {
   margin-bottom: var(--spacing-md);
 }
 
+/* ========================================
+   🔥 NEW: Action Buttons Layout (Extract + Translate)
+   ======================================== */
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.action-buttons .btn-large {
+  flex: 1;
+  min-width: 0;
+}
+
+.action-buttons #extract-btn {
+  flex: 1.5;
+}
+
+.action-buttons #translate-btn {
+  flex: 1;
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.action-buttons #translate-btn:hover:not(:disabled) {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+}
+
+.action-buttons #translate-btn:active:not(:disabled) {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.action-buttons #translate-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+  color: var(--color-text-tertiary);
+}
 
 /* ========================================
    Responsive (for larger popup sizes)

@@ -365,6 +365,124 @@ export async function calculateQualityScore(extractedData, prompt) {
 }
 
 /**
+ * 🔥 NEW: Translate extracted data using Chrome AI Translator
+ * @param {Object|Array} data - Extracted data to translate
+ * @param {string} targetLanguage - Target language (e.g., 'English', 'Spanish', 'French')
+ * @returns {Promise<Object|Array>} Translated data
+ */
+export async function translateData(data, targetLanguage) {
+  try {
+    logger.info(`Translating data to ${targetLanguage} with Chrome AI`);
+    
+    // Map common language names to ISO codes
+    const languageMap = {
+      'english': 'en',
+      'spanish': 'es',
+      'french': 'fr',
+      'german': 'de',
+      'italian': 'it',
+      'portuguese': 'pt',
+      'russian': 'ru',
+      'japanese': 'ja',
+      'chinese': 'zh',
+      'korean': 'ko',
+      'arabic': 'ar',
+      'hindi': 'hi',
+      'dutch': 'nl',
+      'swedish': 'sv',
+      'polish': 'pl',
+      'turkish': 'tr'
+    };
+    
+    const targetLangCode = languageMap[targetLanguage.toLowerCase()] || targetLanguage.toLowerCase();
+    
+    // Recursive function to translate all text fields
+    async function translateObject(obj) {
+      if (typeof obj === 'string') {
+        // Check if string needs translation (skip URLs, IDs, etc.)
+        if (obj.length < 2 || /^https?:\/\//i.test(obj) || /^\d+$/.test(obj)) {
+          return obj;
+        }
+        return await translateText(obj, targetLangCode);
+      }
+      
+      if (Array.isArray(obj)) {
+        return await Promise.all(obj.map(item => translateObject(item)));
+      }
+      
+      if (obj && typeof obj === 'object') {
+        const translated = {};
+        for (const [key, value] of Object.entries(obj)) {
+          // Skip certain fields
+          const skipFields = ['id', 'url', 'link', 'href', 'src', 'image', 'price', 'date', 'timestamp'];
+          if (skipFields.includes(key.toLowerCase())) {
+            translated[key] = value;
+          } else {
+            translated[key] = await translateObject(value);
+          }
+        }
+        return translated;
+      }
+      
+      return obj;
+    }
+    
+    const translatedData = await translateObject(data);
+    
+    logger.info('Data translation completed successfully');
+    return translatedData;
+    
+  } catch (error) {
+    logger.error('Data translation failed', error);
+    
+    // Fallback: If Chrome Translator API fails, use LanguageModel with translation prompt
+    if (error.message.includes('Translator') || error.message.includes('not available')) {
+      logger.warn('Falling back to LanguageModel for translation');
+      return await translateDataWithLanguageModel(data, targetLanguage);
+    }
+    
+    throw error;
+  }
+}
+
+
+/**
+ * 🔥 NEW: Fallback translation using LanguageModel (Gemini Nano)
+ * @param {Object|Array} data - Data to translate
+ * @param {string} targetLanguage - Target language
+ * @returns {Promise<Object|Array>} Translated data
+ */
+async function translateDataWithLanguageModel(data, targetLanguage) {
+  try {
+    logger.info(`Using LanguageModel fallback for translation to ${targetLanguage}`);
+    
+    const prompt = `Translate the following JSON data to ${targetLanguage}. 
+Keep the same structure and only translate text values (not keys, URLs, numbers, or IDs).
+Return valid JSON only:
+
+${JSON.stringify(data, null, 2)}`;
+    
+    const response = await generateText(prompt, {
+      temperature: 0.3,
+      timeout: 60000
+    });
+    
+    const parseResult = parseJSON(response);
+    
+    if (!parseResult.success) {
+      throw new Error('Failed to parse translated JSON');
+    }
+    
+    logger.info('LanguageModel translation completed');
+    return parseResult.data;
+    
+  } catch (error) {
+    logger.error('LanguageModel translation fallback failed', error);
+    throw new Error(`Translation failed: ${error.message}`);
+  }
+}
+
+/**
  * Check Chrome AI capabilities
  * @returns {Promise<Object>} Capabilities object
  */

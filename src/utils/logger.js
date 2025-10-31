@@ -1,10 +1,14 @@
-// VERSION: v1.0.0 | LAST UPDATED: 2025-10-26 | FEATURE: Logging Utility
+// VERSION: v1.0.1 | LAST UPDATED: 2025-10-30 | FEATURE: Logging Utility
+// CRITICAL: Service Worker Compatible - Static Imports Only
+
 
 /**
  * Logging Utility
  * Provides structured logging with levels, prefixes, and debug mode support
  * Respects user's debug_mode setting from configuration
+ * Service Worker Compatible - No Dynamic Imports
  */
+
 
 /**
  * Log levels in order of severity
@@ -17,17 +21,20 @@ export const LOG_LEVELS = {
   ERROR: 'error'
 };
 
+
 /**
  * Current log level (loaded from settings)
  * @type {string}
  */
 let currentLogLevel = LOG_LEVELS.ERROR;
 
+
 /**
  * Debug mode flag (loaded from settings)
  * @type {boolean}
  */
 let debugMode = false;
+
 
 /**
  * Log level priority for filtering
@@ -39,6 +46,7 @@ const LOG_PRIORITY = {
   [LOG_LEVELS.WARN]: 2,
   [LOG_LEVELS.ERROR]: 3
 };
+
 
 /**
  * Initialize logger with settings
@@ -56,6 +64,7 @@ export function initLogger(settings) {
   }
 }
 
+
 /**
  * Check if a log level should be displayed
  * @param {string} level - Log level to check
@@ -66,6 +75,7 @@ function shouldLog(level) {
   const currentPriority = LOG_PRIORITY[currentLogLevel] || 0;
   return messagePriority >= currentPriority;
 }
+
 
 /**
  * Format log message with timestamp and prefix
@@ -80,6 +90,26 @@ function formatMessage(prefix, level, message) {
   return `[${timestamp}] [${levelUpper}] [${prefix}] ${message}`;
 }
 
+
+/**
+ * Safe console wrapper to prevent service worker errors
+ * @param {string} method - Console method name
+ * @param {string} message - Formatted message
+ * @param {...any} args - Additional arguments
+ */
+function safeConsoleLog(method, message, ...args) {
+  try {
+    if (typeof console[method] === 'function') {
+      console[method](message, ...args);
+    } else {
+      console.log(message, ...args);
+    }
+  } catch (e) {
+    // Silently fail in service worker context
+  }
+}
+
+
 /**
  * Log debug message
  * Only logged if debug_mode is enabled
@@ -92,8 +122,9 @@ export function debug(prefix, message, ...args) {
     return;
   }
 
-  console.debug(formatMessage(prefix, LOG_LEVELS.DEBUG, message), ...args);
+  safeConsoleLog('debug', formatMessage(prefix, LOG_LEVELS.DEBUG, message), ...args);
 }
+
 
 /**
  * Log info message
@@ -106,8 +137,9 @@ export function info(prefix, message, ...args) {
     return;
   }
 
-  console.info(formatMessage(prefix, LOG_LEVELS.INFO, message), ...args);
+  safeConsoleLog('info', formatMessage(prefix, LOG_LEVELS.INFO, message), ...args);
 }
+
 
 /**
  * Log warning message
@@ -120,8 +152,9 @@ export function warn(prefix, message, ...args) {
     return;
   }
 
-  console.warn(formatMessage(prefix, LOG_LEVELS.WARN, message), ...args);
+  safeConsoleLog('warn', formatMessage(prefix, LOG_LEVELS.WARN, message), ...args);
 }
+
 
 /**
  * Log error message
@@ -134,11 +167,12 @@ export function warn(prefix, message, ...args) {
 export function error(prefix, message, err, ...args) {
   const errorMessage = formatMessage(prefix, LOG_LEVELS.ERROR, message);
   if (err instanceof Error) {
-    console.error(errorMessage, err, ...args);
+    safeConsoleLog('error', errorMessage, err, ...args);
   } else {
-    console.error(errorMessage, err, ...args);
+    safeConsoleLog('error', errorMessage, err, ...args);
   }
 }
+
 
 /**
  * Log extraction event (specialized logger)
@@ -164,6 +198,7 @@ export function logExtraction(stage, data) {
       debug(prefix, `Unknown stage: ${stage}`, data);
   }
 }
+
 
 /**
  * Log AI provider event (specialized logger)
@@ -191,6 +226,7 @@ export function logAIProvider(provider, event, data) {
   }
 }
 
+
 /**
  * Log rate limiting event (specialized logger)
  * @param {string} event - Event type (check, block, reset)
@@ -213,6 +249,7 @@ export function logRateLimit(event, data) {
   }
 }
 
+
 /**
  * Log storage operation (specialized logger)
  * @param {string} operation - Operation type (read, write, delete)
@@ -228,6 +265,7 @@ export function logStorage(operation, key, success, err) {
     error(prefix, `${operation} failed: ${key}`, err);
   }
 }
+
 
 /**
  * Create a prefixed logger for a specific component

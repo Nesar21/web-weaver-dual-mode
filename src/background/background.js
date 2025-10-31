@@ -1,4 +1,6 @@
-// VERSION: v1.1.1 | LAST UPDATED: 2025-10-29 | FEATURE: Background Service Worker + Cache Cleanup + Screenshot Support
+// VERSION: v1.1.2 | LAST UPDATED: 2025-10-30 | FEATURE: Background Service Worker + Cache Cleanup + Screenshot Support
+// CRITICAL: Service Worker Compatible - Static Imports Only
+
 
 /**
  * Background Service Worker
@@ -6,10 +8,12 @@
  * Coordinates between popup, content scripts, and core functionality
  */
 
+
 // ===================================
 // ALL STATIC IMPORTS AT THE TOP
 // (No dynamic import() allowed in service workers!)
 // ===================================
+
 
 import { initLogger, createLogger } from '../utils/logger.js';
 import { getAllConfigs } from '../utils/config-loader.js';
@@ -19,8 +23,11 @@ import { migrateToEncrypted, saveApiKey, hasApiKey, getValidationStatus } from '
 import { extractFromCurrentTab, exportAsCSV, applySmartFeatures } from '../core/extraction/extraction-engine.js';
 import { autoSelectProvider, getProviderStatus, setProvider, setModel, getCurrentProvider, getCurrentModel } from '../core/ai-providers/provider-manager.js';
 import { getRateLimitStatus } from '../core/rate-limiting/rate-limiter.js';
+import { translateExtractedData } from '../core/translation/translation-manager.js';
+
 
 const logger = createLogger('Background');
+
 
 /**
  * Extension installation handler
@@ -39,6 +46,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   }
 });
 
+
 /**
  * Extension startup handler
  */
@@ -51,25 +59,22 @@ chrome.runtime.onStartup.addListener(async () => {
   }
 });
 
+
 /**
  * Handle first installation
  */
 async function handleFirstInstall() {
   logger.info('First installation detected');
   
-  // Load default settings
   const settings = await loadSettings();
   
-  // Initialize logger with settings
   initLogger({
     log_level: settings.advanced.log_level,
     debug_mode: settings.advanced.debug_mode
   });
   
-  // Auto-select best available provider
   await autoSelectProvider();
   
-  // Open onboarding page
   chrome.tabs.create({
     url: chrome.runtime.getURL('src/ui/onboarding/onboarding.html')
   });
@@ -77,37 +82,34 @@ async function handleFirstInstall() {
   logger.info('First install setup complete');
 }
 
+
 /**
  * Handle extension update
  */
 async function handleUpdate(previousVersion) {
   logger.info(`Extension updated from ${previousVersion}`);
   
-  // Migrate API keys to encrypted storage
   await migrateToEncrypted();
   
-  // Clean up old data
   await cleanupOldData();
   
   logger.info('Update complete');
 }
+
 
 /**
  * Initialize background service
  */
 async function initialize() {
   try {
-    // Load all configurations
     await getAllConfigs();
     
-    // Load settings and initialize logger
     const settings = await loadSettings();
     initLogger({
       log_level: settings.advanced.log_level,
       debug_mode: settings.advanced.debug_mode
     });
     
-    // Cleanup old data
     await cleanupOldData();
     
     logger.info('Background service initialized');
@@ -116,17 +118,17 @@ async function initialize() {
   }
 }
 
-// ✅ NEW: Tab close handler - Clear cache when tab closes
+
+/**
+ * Tab close handler - Clear cache when tab closes
+ */
 chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
   try {
     logger.debug(`Tab ${tabId} closed, clearing cache if exists`);
     
-    // Send message to content script to clear cache
-    // (This will fail silently if tab already closed, which is fine)
     chrome.tabs.sendMessage(tabId, {
       type: 'CLEAR_CACHE'
     }).catch(() => {
-      // Ignore errors - tab is already gone
       logger.debug(`Tab ${tabId} cache clear skipped - tab already closed`);
     });
     
@@ -135,14 +137,15 @@ chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
   }
 });
 
-// ✅ NEW: Navigation handler - Clear cache on navigation
+
+/**
+ * Navigation handler - Clear cache on navigation
+ */
 chrome.webNavigation.onCommitted.addListener(async (details) => {
-  // Only clear cache on main frame navigations (not iframes)
   if (details.frameId !== 0) {
     return;
   }
   
-  // Only clear on actual navigation (not history/reload)
   const clearTransitionTypes = [
     'link',
     'typed',
@@ -157,7 +160,6 @@ chrome.webNavigation.onCommitted.addListener(async (details) => {
   try {
     logger.debug(`Navigation detected on tab ${details.tabId}, clearing cache`);
     
-    // Wait a bit for content script to load
     setTimeout(async () => {
       try {
         const response = await chrome.tabs.sendMessage(details.tabId, {
@@ -168,7 +170,6 @@ chrome.webNavigation.onCommitted.addListener(async (details) => {
           logger.debug(`Cache cleared for tab ${details.tabId}`);
         }
       } catch (error) {
-        // Content script may not be ready yet, that's ok
         logger.debug(`Cache clear on navigation skipped for tab ${details.tabId}`);
       }
     }, 500);
@@ -178,11 +179,11 @@ chrome.webNavigation.onCommitted.addListener(async (details) => {
   }
 });
 
+
 /**
  * Message handler
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // Handle message asynchronously
   handleMessage(message, sender)
     .then(sendResponse)
     .catch(error => {
@@ -193,9 +194,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     });
   
-  // Return true to indicate async response
   return true;
 });
+
 
 /**
  * Handle incoming messages
@@ -238,12 +239,13 @@ async function handleMessage(message, sender) {
       
     case 'APPLY_SMART_FEATURES':
       return await handleSmartFeaturesMessage(data);
-      
-    // ✅ NEW: Screenshot capture handler
+    
+    case 'TRANSLATE_DATA':
+      return await handleTranslateDataMessage(data);
+
     case 'CAPTURE_SCREENSHOT':
       return await handleCaptureScreenshotMessage();
       
-    // Cache management messages
     case 'CACHE_CLEARED':
       return await handleCacheClearedMessage(data);
       
@@ -259,6 +261,7 @@ async function handleMessage(message, sender) {
   }
 }
 
+
 /**
  * Handle extraction request
  */
@@ -273,6 +276,7 @@ async function handleExtractMessage(data) {
   }
 }
 
+
 /**
  * Handle get settings request
  */
@@ -286,6 +290,7 @@ async function handleGetSettingsMessage() {
   }
 }
 
+
 /**
  * Handle update settings request
  */
@@ -293,7 +298,6 @@ async function handleUpdateSettingsMessage(data) {
   try {
     const result = await saveSettings(data.settings);
     
-    // Reinitialize logger if logging settings changed
     if (data.settings.advanced) {
       initLogger({
         log_level: data.settings.advanced.log_level,
@@ -308,6 +312,7 @@ async function handleUpdateSettingsMessage(data) {
   }
 }
 
+
 /**
  * Handle save API key request
  */
@@ -320,6 +325,7 @@ async function handleSaveApiKeyMessage(data) {
     return { success: false, error: error.message };
   }
 }
+
 
 /**
  * Handle get API key status request
@@ -339,6 +345,7 @@ async function handleGetApiKeyStatusMessage() {
   }
 }
 
+
 /**
  * Handle get provider status request
  */
@@ -351,6 +358,7 @@ async function handleGetProviderStatusMessage(data) {
     return { success: false, error: error.message };
   }
 }
+
 
 /**
  * Handle switch provider request
@@ -366,6 +374,7 @@ async function handleSwitchProviderMessage(data) {
   }
 }
 
+
 /**
  * Handle switch model request
  */
@@ -380,6 +389,7 @@ async function handleSwitchModelMessage(data) {
   }
 }
 
+
 /**
  * Handle get rate limit status request
  */
@@ -392,6 +402,7 @@ async function handleGetRateLimitStatusMessage(data) {
     return { success: false, error: error.message };
   }
 }
+
 
 /**
  * Handle export CSV request
@@ -408,6 +419,7 @@ async function handleExportCSVMessage(data) {
   }
 }
 
+
 /**
  * Handle apply smart features request
  */
@@ -423,14 +435,73 @@ async function handleSmartFeaturesMessage(data) {
   }
 }
 
+
 /**
- * ✅ NEW: Handle screenshot capture request
+ * Handle translate data request using Translation Manager
+ */
+async function handleTranslateDataMessage(data) {
+  try {
+    logger.info('Starting translation');
+    
+    const { extractedData, targetLanguage } = data;
+    
+    if (!extractedData) {
+      return { 
+        success: false, 
+        error: 'No data provided for translation' 
+      };
+    }
+    
+    if (!targetLanguage) {
+      return { 
+        success: false, 
+        error: 'Target language not specified' 
+      };
+    }
+    
+    const provider = await getCurrentProvider();
+    const model = await getCurrentModel(provider);
+    
+    logger.debug(`Translation using provider: ${provider}, model: ${model}`);
+    
+    const result = await translateExtractedData(
+      extractedData,
+      targetLanguage,
+      provider,
+      model
+    );
+    
+    logger.info('Translation completed successfully', {
+      provider: result.provider,
+      fieldsTranslated: result.translatedFieldCount
+    });
+    
+    return { 
+      success: true, 
+      translatedData: result.data,
+      provider: result.provider,
+      sourceLang: result.sourceLang,
+      targetLang: result.targetLang,
+      fieldsTranslated: result.translatedFieldCount
+    };
+    
+  } catch (error) {
+    logger.error('Translation failed', error);
+    return { 
+      success: false, 
+      error: error.message 
+    };
+  }
+}
+
+
+/**
+ * Handle screenshot capture request
  */
 async function handleCaptureScreenshotMessage() {
   try {
     logger.info('Capturing screenshot');
     
-    // Capture screenshot from active tab
     const screenshot = await chrome.tabs.captureVisibleTab(null, {
       format: 'png',
       quality: 90
@@ -445,6 +516,7 @@ async function handleCaptureScreenshotMessage() {
   }
 }
 
+
 /**
  * Handle cache cleared notification
  */
@@ -452,7 +524,6 @@ async function handleCacheClearedMessage(data) {
   try {
     logger.debug(`Cache cleared: ${data.reason || 'manual'}`);
     
-    // Notify popup if open
     try {
       chrome.runtime.sendMessage({
         type: 'CACHE_UPDATED',
@@ -469,6 +540,7 @@ async function handleCacheClearedMessage(data) {
   }
 }
 
+
 /**
  * Handle cache full warning
  */
@@ -476,7 +548,6 @@ async function handleCacheFullWarningMessage(data) {
   try {
     logger.warn(`Cache full warning: ${data.percentage}%`);
     
-    // Notify popup if open
     try {
       chrome.runtime.sendMessage({
         type: 'CACHE_WARNING',
@@ -496,6 +567,7 @@ async function handleCacheFullWarningMessage(data) {
     return { success: false, error: error.message };
   }
 }
+
 
 // Initialize on service worker start
 initialize();

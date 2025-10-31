@@ -664,6 +664,72 @@ export async function supportsVision(modelId) {
   return modelInfo?.supports_vision || false;
 }
 
+
+/**
+ * 🔥 NEW: Translate extracted data using Gemini API
+ * @param {string} modelId - Model ID to use for translation
+ * @param {Object|Array} data - Extracted data to translate
+ * @param {string} targetLanguage - Target language (e.g., 'English', 'Spanish', 'French')
+ * @returns {Promise<Object|Array>} Translated data
+ */
+export async function translateData(modelId, data, targetLanguage) {
+  try {
+    logger.info(`Translating data to ${targetLanguage} with ${modelId}`);
+    
+    // Build translation prompt
+    const prompt = `You are a professional translator. Translate the following JSON data to ${targetLanguage}.
+
+CRITICAL INSTRUCTIONS:
+1. Translate ONLY text values (descriptions, titles, names, labels)
+2. DO NOT translate: URLs, IDs, numbers, prices, dates, email addresses, property keys
+3. Keep the EXACT same JSON structure
+4. Preserve all data types (strings remain strings, numbers remain numbers)
+5. Return ONLY valid JSON, no explanations
+
+DATA TO TRANSLATE:
+${JSON.stringify(data, null, 2)}
+
+Return the translated data as valid JSON:`;
+    
+    // Build contents
+    const contents = [{
+      parts: [{ text: prompt }]
+    }];
+    
+    // Generate with low temperature for accurate translation
+    const result = await generateContent(modelId, contents, {
+      temperature: 0.3,
+      maxOutputTokens: 8192
+    });
+    
+    // Parse translated JSON
+    const parseResult = parseJSON(result.text);
+    
+    if (!parseResult.success) {
+      logger.error('Translation JSON parse failed', { error: parseResult.error });
+      throw new Error(`Translation failed: Unable to parse translated JSON - ${parseResult.error}`);
+    }
+    
+    logger.info('Data translation completed successfully');
+    
+    return parseResult.data;
+    
+  } catch (error) {
+    logger.error('Data translation failed', error);
+    
+    // Provide specific error message
+    if (error.message.includes('Rate limit')) {
+      throw new Error('Translation failed: Rate limit exceeded. Please wait and try again.');
+    } else if (error.message.includes('API key')) {
+      throw new Error('Translation failed: Invalid API key. Please check your settings.');
+    } else if (error.message.includes('parse')) {
+      throw new Error('Translation failed: Unable to process translated data.');
+    } else {
+      throw new Error(`Translation failed: ${error.message}`);
+    }
+  }
+}
+
 // TEST SCENARIOS:
 // 1. Generate content with text-only prompt
 // 2. Generate content with vision (text + image)
