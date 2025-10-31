@@ -5,7 +5,7 @@
 Extract structured data from any webpage in seconds using advanced AI technology. No coding required.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-Free%20for%20All-green)
 ![Chrome](https://img.shields.io/badge/chrome-128%2B-red)
 
 ---
@@ -13,8 +13,8 @@ Extract structured data from any webpage in seconds using advanced AI technology
 ## ✨ Features
 
 ### 🤖 **Dual AI Provider Support**
-- **Chrome Built-in AI** (Gemini Nano) - Free, local, privacy-focused
-- **Gemini Cloud API** - Powerful cloud models with advanced features
+- **Chrome Built-in AI (Gemini Nano)** — Free, local, and privacy-focused  
+- **Gemini Cloud API** — Powerful cloud models with advanced features
 
 ### ⚡ **Smart Extraction**
 - Auto-detect content types (products, articles, jobs, posts, generic)
@@ -39,270 +39,219 @@ Extract structured data from any webpage in seconds using advanced AI technology
 - Encrypted API key storage
 - Local processing option (Chrome AI)
 - No data sent to third parties
-- Open source and transparent
+- 100% open and transparent
 
 ---
 
 ## 📦 Installation
 
 ### From Chrome Web Store
-1. Visit [Chrome Web Store](#) (link coming soon)
-2. Click "Add to Chrome"
+1. Visit [Chrome Web Store](#) *(link coming soon)*
+2. Click **Add to Chrome**
 3. Complete onboarding setup
 
 ### From Source (Developer Mode)
-Clone repository
-git clone https://github.com/yourusername/web-weaver.git
-cd web-weaver
-
+```bash
+git clone https://github.com/Nesar21/web-weaver-dual-mode.git
+cd web-weaver-dual-mode
 Load in Chrome
-1. Open chrome://extensions/
-2. Enable "Developer mode"
-3. Click "Load unpacked"
-4. Select the web-weaver directory
-text
 
----
+Open chrome://extensions/
 
-## 🎯 Quick Start
+Enable Developer mode
 
-### 1. Choose AI Provider
+Click Load unpacked
 
-**Option A: Chrome Built-in AI** (Recommended)
-- No setup required
-- Free and private
-- Works offline
-- Requires Chrome 128+
+Select the web-weaver-dual-mode directory
 
-**Option B: Gemini Cloud API**
-- Get free API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-- More powerful and accurate
-- Advanced features available
+🎯 Quick Start
+1. Choose AI Provider
+🧠 Option A: Chrome Built-in AI (Recommended)
+No setup required
 
-### 2. Extract Data
+Free and private
 
-1. Navigate to any webpage
-2. Click the Web Weaver icon in toolbar
-3. Select extraction mode:
-   - **Extract All Items**: Get all structured data
-   - **Extract Main Article**: Focus on primary content
-4. Choose content type (or use auto-detect)
-5. Click "Extract Data"
+Works offline
 
-### 3. Export Results
+Requires Chrome 128+
 
-- **JSON**: Download structured data
-- **CSV**: Export to spreadsheet
-- **Copy**: Paste into other applications
+☁️ Option B: Gemini Cloud API
+Get a free API key from Google AI Studio
 
----
+More powerful and accurate
 
-## 🔧 Configuration
+Advanced AI features enabled
 
-### Extraction Settings
-- **Mode**: Extract All / Extract Main
-- **Content Type**: Auto-detect, Products, Articles, Jobs, Posts, Generic
-- **Timeout**: 10-120 seconds (default: 60s)
-- **Screenshot**: Enable for visual content (Extract Main only)
+2. Extract Data
+Navigate to any webpage
 
-### Smart Features (Gemini Cloud only)
-- **Quality Score**: Assess extraction completeness
-- **Deduplication**: Remove duplicate items
-- **Comparisons**: Side-by-side item comparisons
-- **Recommendations**: Personalized suggestions
-- **Trends**: Pattern detection (10+ items)
+Click the Web Weaver icon in your Chrome toolbar
 
-### HTML Preprocessing
-- Remove scripts, styles, comments
-- Remove navigation and footer elements
-- Set max HTML size limit (default: 500KB)
+Select extraction mode:
 
-### Advanced Options
-- **Log Level**: Error / Warning / Info / Debug
-- **Debug Mode**: Detailed console output
-- **Audio Feedback**: Sound effects for events
-- **Theme**: Light / Dark / Auto (system)
+Extract All Items → All structured data
 
----
+Extract Main Article → Focus on key content
 
-## 📖 Usage Examples
+Choose a content type or use auto-detect
 
-### Extract Product Listings
-Visit e-commerce site (Amazon, eBay, etc.)
+Click Extract Data
 
-Select "Extract All Items"
+3. Export Results
+JSON → Download structured data
 
-Content type: "Products" or "Auto-detect"
+CSV → Export for spreadsheets
 
-Export as CSV for spreadsheet analysis
+Copy → Paste into any app instantly
 
-text
+🔧 Configuration
+Extraction Settings
+Setting	Description
+Mode	Extract All / Extract Main
+Content Type	Auto, Products, Articles, Jobs, Posts, Generic
+Timeout	10–120 seconds (default 60s)
+Screenshot	Capture visual content (Extract Main only)
 
-### Extract Job Posts
-Visit job board (LinkedIn, Indeed, etc.)
+Smart Features (Gemini Cloud only)
+Quality Score
 
-Select "Extract All Items"
+Deduplication
 
-Content type: "Jobs"
+Comparisons
 
-Enable deduplication for unique results
+Recommendations
 
-text
+Trends
 
-### Extract Article Content
-Visit blog or news site
+HTML Preprocessing
+Removes scripts, styles, comments
 
-Select "Extract Main Article"
+Removes navigation & footers
 
-Enable screenshot for images
+Limits max HTML to 500KB (default)
+
+Advanced Options
+Log Level: Error / Warning / Info / Debug
+
+Debug Mode: Detailed console logs
+
+Audio Feedback: Sound alerts for events
+
+Theme: Light / Dark / Auto
+
+📖 Usage Examples
+🛍️ Extract Product Listings
+Visit Amazon, eBay, etc.
+
+Mode: Extract All Items
+
+Content Type: Products / Auto
+
+Export as CSV for analysis
+
+💼 Extract Job Posts
+Visit LinkedIn, Indeed, etc.
+
+Mode: Extract All Items
+
+Content Type: Jobs
+
+Enable deduplication for clean data
+
+📰 Extract Article Content
+Visit any blog or news site
+
+Mode: Extract Main Article
+
+Enable Screenshot
 
 Export as JSON for archival
 
-text
+🧩 Key Components
+Component	Path	Description
+Extraction Engine	src/core/extraction/extraction-engine.js	Orchestrates HTML processing, AI extraction, scoring
+AI Providers	src/core/ai-providers/	Manages Chrome AI and Gemini Cloud APIs
+Rate Limiting	src/core/rate-limiting/	Tracks RPM/RPD and cooldowns
+Storage	src/core/storage/	Handles encrypted keys, cache, and settings
 
----
+🔐 Privacy & Security
+Data Handling
+Mode	Where Processing Happens
+Chrome Built-in AI	On your device (local only)
+Gemini Cloud API	On Google’s servers (secure & limited)
 
-## 🏗️ Architecture
+No third-party tracking
 
-### Project Structure
-web-weaver/
-├── config/ # Configuration files
-│ ├── models.json # AI model definitions
-│ ├── rate-limits.json # Rate limit configs
-│ ├── endpoints.json # API endpoints
-│ ├── prompts.json # Extraction prompts
-│ └── defaults.json # Default settings
-├── src/
-│ ├── background/ # Service worker
-│ ├── content/ # Content scripts
-│ ├── core/ # Core functionality
-│ │ ├── ai-providers/ # AI provider integrations
-│ │ ├── error-handling/
-│ │ ├── extraction/ # Extraction engine
-│ │ ├── rate-limiting/
-│ │ └── storage/ # Data persistence
-│ └── utils/ # Utilities
-├── ui/ # User interface
-│ ├── popup/ # Extension popup
-│ ├── settings/ # Settings page
-│ └── onboarding/ # First-run experience
-├── assets/ # Icons and resources
-└── manifest.json # Chrome extension manifest
+Open-source for full transparency
 
-text
+API Key Protection
+Encrypted with AES-256-GCM
 
-### Key Components
+Only used for Gemini API
 
-**Extraction Engine** (`src/core/extraction/extraction-engine.js`)
-- Orchestrates HTML preprocessing, AI extraction, post-processing
-- Content type detection
-- Quality scoring
-- Smart features coordination
+Optional session-only storage
 
-**AI Providers** (`src/core/ai-providers/`)
-- Chrome AI provider (local Gemini Nano)
-- Gemini Cloud provider (cloud API)
-- Provider manager for switching
+One-click key removal
 
-**Rate Limiting** (`src/core/rate-limiting/`)
-- RPM (Requests Per Minute) tracking
-- RPD (Requests Per Day) tracking
-- Countdown timers for rate limit waits
+🤝 Contributing
+Fork this repo
 
-**Storage** (`src/core/storage/`)
-- Encrypted API key storage
-- Settings persistence
-- Cache management
+Create a new branch
 
----
+bash
+Copy code
+git checkout -b feature/amazing-feature
+Commit changes
 
-## 🔐 Privacy & Security
+bash
+Copy code
+git commit -m "Add amazing feature"
+Push and open a PR
 
-### Data Handling
-- **Chrome Built-in AI**: All processing happens locally on your device
-- **Gemini Cloud API**: Data sent to Google AI for processing only
-- **No third-party tracking**: We don't collect or share your data
-- **Open source**: Full transparency in codebase
-
-### API Key Security
-- Stored encrypted using AES-256-GCM
-- Never transmitted except to official Gemini API
-- Optional session-only storage (not persisted)
-- Clear key option in settings
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how:
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-### Development Setup
-Install dependencies (if any)
+Development Setup
+bash
+Copy code
 npm install
-
-Make changes
-Test in Chrome developer mode
-Run tests (when available)
 npm test
+Load into Chrome Developer Mode and test directly.
 
-text
+📝 Changelog
+v1.0.0 — 2025-10-26
+Initial release
 
----
+Chrome Built-in AI + Gemini Cloud support
 
-## 📝 Changelog
+Multiple content types
 
-### v1.0.0 (2025-10-26)
-- Initial release
-- Chrome Built-in AI support
-- Gemini Cloud API support
-- Multiple content types
-- Smart features
-- Export to JSON/CSV
-- Audio feedback
-- Dark mode support
+Smart features (dedup, quality, trends)
 
----
+JSON/CSV export
 
-## 🐛 Known Issues
+Dark mode, audio feedback
 
-- Chrome Built-in AI requires Chrome 128+ and may not be available in all regions
-- Screenshot capture requires `activeTab` permission
-- Rate limits vary by Gemini model (see rate-limits.json)
+🐛 Known Issues
+Chrome AI requires Chrome 128+ and may not be available everywhere
 
----
+Screenshot capture needs activeTab permission
 
-## 📄 License
+Rate limits depend on the Gemini model
 
-MIT License - see [LICENSE](LICENSE) file for details
+🙏 Acknowledgments
+Google Chrome AI team for Gemini Nano integration
 
----
+Google AI Studio for Gemini Cloud API
 
-## 🙏 Acknowledgments
+Open-source Chrome Extensions community
 
-- Google Chrome AI team for Gemini Nano integration
-- Google AI Studio for Gemini Cloud API
-- Chrome Extensions community
+📧 Support
+Issues: GitHub Issues
 
----
+Discussions: GitHub Discussions
 
-## 📧 Support
+Email: nesaramingad821@gmail.com
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/web-weaver/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/web-weaver/discussions)
-- **Email**: support@example.com
+🌟 Star History
+If you find Web Weaver Lightning useful, please ⭐ star the repository!
 
----
-
-## 🌟 Star History
-
-If you find Web Weaver useful, please ⭐ star the repository!
-
----
-
-**Made with ❤️ by [Your Name]**
+Made with ❤️ by Nesara Amingad
+Free for all use — open and community-driven.

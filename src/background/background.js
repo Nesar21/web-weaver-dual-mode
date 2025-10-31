@@ -23,7 +23,6 @@ import { migrateToEncrypted, saveApiKey, hasApiKey, getValidationStatus } from '
 import { extractFromCurrentTab, exportAsCSV, applySmartFeatures } from '../core/extraction/extraction-engine.js';
 import { autoSelectProvider, getProviderStatus, setProvider, setModel, getCurrentProvider, getCurrentModel } from '../core/ai-providers/provider-manager.js';
 import { getRateLimitStatus } from '../core/rate-limiting/rate-limiter.js';
-import { translateExtractedData } from '../core/translation/translation-manager.js';
 
 
 const logger = createLogger('Background');
@@ -432,65 +431,6 @@ async function handleSmartFeaturesMessage(data) {
   } catch (error) {
     logger.error('Failed to apply smart features', error);
     return { success: false, error: error.message };
-  }
-}
-
-
-/**
- * Handle translate data request using Translation Manager
- */
-async function handleTranslateDataMessage(data) {
-  try {
-    logger.info('Starting translation');
-    
-    const { extractedData, targetLanguage } = data;
-    
-    if (!extractedData) {
-      return { 
-        success: false, 
-        error: 'No data provided for translation' 
-      };
-    }
-    
-    if (!targetLanguage) {
-      return { 
-        success: false, 
-        error: 'Target language not specified' 
-      };
-    }
-    
-    const provider = await getCurrentProvider();
-    const model = await getCurrentModel(provider);
-    
-    logger.debug(`Translation using provider: ${provider}, model: ${model}`);
-    
-    const result = await translateExtractedData(
-      extractedData,
-      targetLanguage,
-      provider,
-      model
-    );
-    
-    logger.info('Translation completed successfully', {
-      provider: result.provider,
-      fieldsTranslated: result.translatedFieldCount
-    });
-    
-    return { 
-      success: true, 
-      translatedData: result.data,
-      provider: result.provider,
-      sourceLang: result.sourceLang,
-      targetLang: result.targetLang,
-      fieldsTranslated: result.translatedFieldCount
-    };
-    
-  } catch (error) {
-    logger.error('Translation failed', error);
-    return { 
-      success: false, 
-      error: error.message 
-    };
   }
 }
 

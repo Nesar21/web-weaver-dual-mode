@@ -35,7 +35,6 @@ const elements = {
   modelSelector: null,
   modelSelect: null,
   apiKeyWarning: null,
-  translateBtn: null,
   addApiKeyLink: null,
   
   // 🔥 NEW: Cache elements
@@ -134,8 +133,6 @@ function cacheElements() {
   elements.modelSelector = document.getElementById('model-selector');
   elements.modelSelect = document.getElementById('model-select');
   elements.apiKeyWarning = document.getElementById('api-key-warning');
-    // 🔥 NEW: Translate button
-  elements.translateBtn = document.getElementById('translate-btn');
   elements.addApiKeyLink = document.getElementById('add-api-key-link');
   
   // 🔥 NEW: Cache elements
@@ -457,9 +454,6 @@ function setupEventListeners() {
   
   // Extract button
   elements.extractBtn.addEventListener('click', handleExtractClick);
-
-  // 🔥 NEW: Translate button
-  elements.translateBtn.addEventListener('click', handleTranslateClick);
   
   // Results actions
   elements.closeResultsBtn.addEventListener('click', hideResults);
@@ -1223,49 +1217,6 @@ function handleRateLimitDisplay(data) {
   
   // Show rate limit section
   elements.rateLimitSection.classList.remove('hidden');
-}
-
-/**
- * 🔥 NEW: Handle translate button click
- */
-async function handleTranslateClick() {
-  if (!state.lastResult || !state.lastResult.data) {
-    showNotification('warning', 'No Data', 'Extract data first before translating');
-    return;
-  }
-  
-  // TODO: Add translation language selector in future version
-  const targetLanguage = 'English'; // Default for now
-  
-  try {
-    showProgress(`Translating to ${targetLanguage}...`);
-    
-    const response = await sendMessage({
-      type: 'TRANSLATE_DATA',
-      data: {
-        extractedData: state.lastResult.data,
-        targetLanguage: targetLanguage
-      }
-    });
-    
-    hideProgress();
-    
-    if (response.success) {
-      // Update results with translated data
-      state.lastResult.data = response.translatedData;
-      displayResults(state.lastResult);
-      
-      showNotification('success', 'Translation Complete', 
-        `Data translated to ${targetLanguage}`);
-    } else {
-      showNotification('error', 'Translation Failed', response.error);
-    }
-    
-  } catch (error) {
-    hideProgress();
-    console.error('[Popup] Translation failed', error);
-    showNotification('error', 'Translation Failed', error.message);
-  }
 }
 
 /**
