@@ -101,6 +101,72 @@ Load into Chrome:
 | Error Recovery | 7-level exponential backoff |
 | Security | AES encryption with no session persistence |
 
+## Configuration Reference
+
+Below are the key defaults and limits used by **Web Weaver Dual Mode**  
+(from your Chrome AI and Gemini setup).
+
+---
+
+### Selected Model
+
+| Model | Description | Rate Limit |
+|--------|--------------|-------------|
+| **Gemini 2.0 Flash Lite** | Fast and cost-efficient for everyday extraction | 30 RPM |
+| **Gemini 2.0 Flash Experimental** | Early access experimental model (higher quality) | 10 RPM |
+| **Gemini 2.5 Pro** | Advanced reasoning and precision model | 2 RPM |
+
+> 💡 *“Lite” = Speed; “Exp” = Beta Quality; “Pro” = Deep Accuracy.*
+
+---
+
+### Model Rate Limits (Google AI Studio)
+
+| Model ID | RPM | TPM | RPD | Notes |
+|-----------|-----|-----|-----|-------|
+| **gemini-2.0-flash-exp** | 10 | 250 K | 50 | Experimental tier |
+| **gemini-2.0-flash-lite** | 15 | 1 M | 200 | Best balance of speed & cost |
+| **gemini-2.5-pro** | 2 | 125 K | 50 | High-precision for complex parsing |
+
+> **RPM:** Requests / minute | **TPM:** Tokens / minute | **RPD:** Requests / day
+
+---
+
+### Default Extraction Modes
+
+| Mode | Description |
+|------|--------------|
+| **Extract All Items** | Pulls every detectable data element (links, prices, text, etc.) |
+| **Extract Main Article** | Focuses on core readable content (ideal for blogs/news) |
+
+> Use **All Items** for e-commerce or job boards, **Main Article** for text-heavy pages.
+
+---
+
+### Default Content Types
+
+| Type | Auto-Detected Behavior |
+|------|-------------------------|
+| **Auto-detect** | Smartly identifies best content schema |
+| **Products** | Extracts titles, prices, ratings |
+| **Articles** | Gets title, author, publish date, content |
+| **Job Listings** | Fetches role, company, location |
+| **Social Posts** | Pulls user handle, post text, timestamp |
+| **Generic Data** | Catches everything else (fallback mode) |
+
+---
+
+### Log Levels
+
+| Level | Purpose |
+|--------|----------|
+| **Error** | Only critical failures |
+| **Warning** | Minor recoverable issues |
+| **Info** | Normal run details |
+| **Debug** | Deep trace logs for developers |
+
+> Recommended: Keep `Info` in production, `Debug` for testing.
+
 ---
 
 ## Settings Deep Dive
