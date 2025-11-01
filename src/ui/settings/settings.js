@@ -40,7 +40,6 @@ const elements = {
   extractionModeSelect: null,
   contentTypeSelect: null,
   timeoutInput: null,
-  screenshotEnabled: null,
   
   // Smart Features
   qualityScoreEnabled: null,
@@ -138,7 +137,6 @@ function cacheElements() {
   elements.extractionModeSelect = document.getElementById('extraction-mode-select');
   elements.contentTypeSelect = document.getElementById('content-type-select');
   elements.timeoutInput = document.getElementById('timeout-input');
-  elements.screenshotEnabled = document.getElementById('screenshot-enabled');
   
   // Smart Features
   elements.qualityScoreEnabled = document.getElementById('quality-score-enabled');
@@ -265,7 +263,6 @@ function populateForm(settings) {
   elements.extractionModeSelect.value = settings.extraction?.mode || 'extract_all';
   elements.contentTypeSelect.value = settings.extraction?.content_type || 'auto';
   elements.timeoutInput.value = settings.extraction?.timeout_seconds || 60;
-  elements.screenshotEnabled.checked = settings.extraction?.screenshot?.enabled || false;
   
   // Smart Features
   elements.qualityScoreEnabled.checked = settings.smart_features?.quality_score?.enabled || false;
@@ -464,18 +461,6 @@ function collectSettings() {
       selected_model: {
         chrome_ai: 'gemini_nano',
         gemini_cloud: elements.modelSelect.value
-      }
-    },
-    extraction: {
-      mode: elements.extractionModeSelect.value,
-      content_type: elements.contentTypeSelect.value,
-      timeout_seconds: parseInt(elements.timeoutInput.value),
-      screenshot: {
-        enabled: elements.screenshotEnabled.checked,
-        format: 'png',
-        quality: 90,
-        max_width: 1920,
-        max_height: 10000
       }
     },
     smart_features: {
@@ -829,7 +814,6 @@ function setupEventListeners() {
   elements.extractionModeSelect.addEventListener('change', markDirty);
   elements.contentTypeSelect.addEventListener('change', markDirty);
   elements.timeoutInput.addEventListener('change', markDirty);
-  elements.screenshotEnabled.addEventListener('change', markDirty);
   
   // Smart Features
   elements.qualityScoreEnabled.addEventListener('change', markDirty);
